@@ -1,11 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ page import="com.mvc.enterprises.utils.Utils" %>
+
+<%		
+	String userRole = Utils.getUserRole(request);
+%>
 
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ILabs: Product</title>
+<title>MVC-Microservices Application: Product</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />
@@ -25,7 +30,13 @@
 		</c:if>
 	</p>
 	<p>&nbsp;&nbsp;
-		<input type="button" value="Add Product" onclick="javascript:jsProductSubmit('${pageContext.request.contextPath}/product/displayNewProduct');" />&nbsp;
+		<%
+			if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+		%>
+				<input type="button" value="Add Product" onclick="javascript:jsProductSubmit('${pageContext.request.contextPath}/product/displayNewProduct');" />&nbsp;
+		<%
+			}
+		%>
 		<input type="button" value="Return IL Home" onclick="javascript:jsProductSubmit('${pageContext.request.contextPath}/product/returnILHome');" />
 	</p>
 	
@@ -78,19 +89,58 @@
 				<th>Product name</th>				
 				<th>Product description</th>
 				<th>Cas Number</th>
-				<th>Update</th>
-				<th>Delete</th>								
+				<%
+					if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+				%>
+						<th>Update</th>
+						<th>Delete</th>
+				<%
+					}
+				%>							
 			</tr>
 			<c:forEach items="${productForm.resultProducts}" var="product" varStatus="status">		
 				<tr class="detailData">								
 					<td class="center">${product.productName}</td>
 					<td class="leftNoBold">${product.productDescription}</td>
 					<td class="leftNoBold">${product.casNumber}</td>
-					<td class="leftNoBold"><input type="button" value="Update" onclick="javascript:jsProductUorDSubmit('${pageContext.request.contextPath}/product/displayUpdateProduct','${product.productId}');" /></td>
-					<td class="leftNoBold"><input type="button" value="Delete" onclick="javascript:jsProductUorDSubmit('${pageContext.request.contextPath}/product/displayDeleteProduct','${product.productId}');" /></td>											
+					<%
+						if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+					%>
+							<td class="leftNoBold"><input type="button" value="Update" onclick="javascript:jsProductUorDSubmit('${pageContext.request.contextPath}/product/displayUpdateProduct','${product.productId}');" /></td>
+							<td class="leftNoBold"><input type="button" value="Delete" onclick="javascript:jsProductUorDSubmit('${pageContext.request.contextPath}/product/displayDeleteProduct','${product.productId}');" /></td>											
+					<%
+						}
+					%>
 				</tr>																		
 			</c:forEach>								
-		</table>	
+		</table>
+		<c:if test="${productForm.pageResponseDto.totalPages > 1}">
+		    <div style="text-align:center;margin-top:20px;">
+		
+		        <!-- Previous -->
+		        <c:if test="${productForm.pageResponseDto.pageNumber > 0}">
+		            <a href="?page=${productForm.pageResponseDto.pageNumber - 1}&productName=${productForm.product.productName}&productDescription=${productForm.product.productDescription}&casNumber=${productForm.product.casNumber}">Previous</a>
+		        </c:if>
+		
+		        <!-- Page Numbers -->
+		        <c:forEach begin="0" end="${productForm.pageResponseDto.totalPages-1}" var="i">
+		            <c:choose>
+		                <c:when test="${i == productForm.pageResponseDto.pageNumber}">
+		                    <b>[${i+1}]</b>
+		                </c:when>
+		                <c:otherwise>
+		                    <a href="?page=${i}&productName=${productForm.product.productName}&productDescription=${productForm.product.productDescription}&casNumber=${productForm.product.casNumber}">${i+1}</a>
+		                </c:otherwise>
+		            </c:choose>
+		        </c:forEach>
+		
+		        <!-- Next -->
+		        <c:if test="${productForm.pageResponseDto.pageNumber < productForm.pageResponseDto.totalPages-1}">
+		            <a href="?page=${productForm.pageResponseDto.pageNumber + 1}&productName=${productForm.product.productName}&productDescription=${productForm.product.productDescription}&casNumber=${productForm.product.casNumber}">Next</a>
+		        </c:if>
+		
+		    </div>
+		</c:if>		
 	</c:if>
 	<input type="hidden" name="productId" />
 </form:form>

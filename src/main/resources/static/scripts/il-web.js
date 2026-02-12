@@ -26,7 +26,7 @@ function checkKeyNumberNoNegative(e) {
 function jsResetHome(url) {
 	const form = document.getElementById("loginForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -34,7 +34,7 @@ function jsResetHome(url) {
 function jsUserSubmit(url) {
 	const form = document.getElementById("userForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -43,7 +43,7 @@ function jsUserUorDSubmit(url, userId) {
 	const form = document.getElementById("userForm");
 	form.action = url;   // change form action to reset mapping
 	form.userId.value = userId; // set hidden field
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -51,7 +51,7 @@ function jsUserUorDSubmit(url, userId) {
 function jsManufacturerSubmit(url) {
 	const form = document.getElementById("manufacturerForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -60,7 +60,7 @@ function jsManufacturerUorDSubmit(url, manufacturerId) {
 	const form = document.getElementById("manufacturerForm");
 	form.action = url;   // change form action to reset mapping
 	form.manufacturerId.value = manufacturerId; // set hidden field
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -68,7 +68,7 @@ function jsManufacturerUorDSubmit(url, manufacturerId) {
 function jsProductSubmit(url) {
 	const form = document.getElementById("productForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -77,7 +77,7 @@ function jsProductUorDSubmit(url, productId) {
 	const form = document.getElementById("productForm");
 	form.action = url;   // change form action to reset mapping
 	form.productId.value = productId; // set hidden field
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 }
 
@@ -85,7 +85,7 @@ function jsProductUorDSubmit(url, productId) {
 function jsOrderQtySubmit(url) {
 	const form = document.getElementById("orderQtyForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -94,7 +94,7 @@ function jsOrderQtyUorDSubmit(url, orderId) {
 	const form = document.getElementById("orderQtyForm");
 	form.action = url;   // change form action to reset mapping
 	form.orderId.value = orderId; // set hidden field
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 }
 
@@ -102,7 +102,7 @@ function jsOrderQtyUorDSubmit(url, orderId) {
 function jsOrderDocumentSubmit(url) {
 	const form = document.getElementById("orderDocumentForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 }
 
@@ -110,7 +110,7 @@ function jsOrderDocumentSubmit(url) {
 function jsFileReadSubmit(url) {
 	const form = document.getElementById("fileReadForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 }
 
@@ -118,7 +118,7 @@ function jsFileReadSubmit(url) {
 function jsMfgvsproductSubmit(url) {
 	const form = document.getElementById("mfgvsproductForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 } 
 
@@ -127,28 +127,6 @@ function jsMfgvsproductUorDSubmit(url, mfgvsproductId) {
 	const form = document.getElementById("mfgvsproductForm");
 	form.action = url;   // change form action to reset mapping
 	form.mfgvsproductId.value = mfgvsproductId; // set hidden field
-	form.method = "get"; // reset can be GET
+	form.method = "post"; // reset can be GET
 	form.submit();       // submit the form
 }
-
-//Process retrieve day by day expenses
-function jsWebInterface(requestType) {
-	if(requestType == "retrieveAllDeptExpenseType") {
-		document.webInterfaceForm.type.value = "retrieveAllDeptExpenseType";
-	} else if(requestType == "retrieveDeptExpenseTypeByDepartment") {
-		document.webInterfaceForm.type.value = "retrieveDeptExpenseTypeByDepartment";
-	} else if(requestType == "retrieveDayByDayExpenses") {
-		document.webInterfaceForm.type.value = "retrieveDayByDayExpenses";	
-	} else if(requestType == "retrieveVendorMaterialExpenses") {
-		document.webInterfaceForm.type.value = "retrieveVendorMaterialExpenses";
-	} else if(requestType == "retrieveMaterialGroupByDepartmentId") {
-		document.webInterfaceForm.type.value = "retrieveMaterialGroupByDepartmentId";	
-	} else if(requestType == "retrieveVendorMachineExpenses") {
-		document.webInterfaceForm.type.value = "retrieveVendorMachineExpenses";
-	} else if(requestType == "retrieveMachineGroupByDepartmentId") {
-		document.webInterfaceForm.type.value = "retrieveMachineGroupByDepartmentId";			
-	} else if(requestType == "cancelHome") {
-		document.webInterfaceForm.type.value = "cancelHome";
-	}
-	document.webInterfaceForm.submit();	
-} 

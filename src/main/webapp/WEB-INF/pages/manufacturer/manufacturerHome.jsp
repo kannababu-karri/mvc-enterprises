@@ -1,11 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ page import="com.mvc.enterprises.utils.Utils" %>
+
+<%		
+	String userRole = Utils.getUserRole(request);
+%>
 
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ILabs: Manufacturer</title>
+<title>MVC-Microservices Application: Manufacturer</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />
@@ -25,7 +30,13 @@
 		</c:if>
 	</p>
 	<p>&nbsp;&nbsp;
-		<input type="button" value="Add Manufacturer" onclick="javascript:jsManufacturerSubmit('${pageContext.request.contextPath}/manufacturer/displayNewManufacturer');" />&nbsp;
+		<%
+			if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+		%>
+				<input type="button" value="Add Manufacturer" onclick="javascript:jsManufacturerSubmit('${pageContext.request.contextPath}/manufacturer/displayNewManufacturer');" />&nbsp;
+		<%
+			}
+		%>
 		<input type="button" value="Return IL Home" onclick="javascript:jsManufacturerSubmit('${pageContext.request.contextPath}/manufacturer/returnILHome');" />
 	</p>
 	
@@ -46,7 +57,8 @@
 		<tr>
 			<td width="1%">&nbsp;</td>			
 			<td width="50%" align="center" colspan="2">
-				<input type="submit" value="Submit" />&nbsp;&nbsp;<input type="button" value="Cancel" onclick="javascript:jsManufacturerSubmit('${pageContext.request.contextPath}/manufacturer/returnILHome');" />
+				<input type="submit" value="Submit" />&nbsp;&nbsp;
+				<input type="button" value="Cancel" onclick="javascript:jsManufacturerSubmit('${pageContext.request.contextPath}/manufacturer/returnILHome');" />
 			</td>
 			<td width="49%">&nbsp;</td>
 		</tr>				
@@ -59,36 +71,69 @@
 		<p class="searchTitle">&nbsp;&nbsp;Manufacturer Search Results:</p>
 		<table class="searchDetail">			
 			<tr>				
-				<th>Manufacturer name</th>				
-				<th>Products</th>
+				<th>Manufacturer name</th>
 				<th>Address1</th>
 				<th>Address2</th>
 				<th>City</th>
 				<th>State</th>
 				<th>Zip</th>
 				<th>Zip Ext</th>
-				<th>Update</th>
-				<th>Delete</th>								
+				<%
+					if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+				%>
+						<th>Update</th>
+						<th>Delete</th>
+				<%
+					}
+				%>							
 			</tr>
 			<c:forEach items="${manufacturerForm.resultManufacturers}" var="manufacturer" varStatus="status">		
 				<tr class="detailData">								
 					<td class="center">${manufacturer.mfgName}</td>
-					<td class="leftNoBold">
-						<c:forEach items="${manufacturer.products}" var="product" varStatus="status">
-			            	${product.productName}
-			        	</c:forEach>
-					</td>
 					<td class="leftNoBold">${manufacturer.address1}</td>
 					<td class="leftNoBold">${manufacturer.address2}</td>
 					<td class="leftNoBold">${manufacturer.city}</td>
 					<td class="leftNoBold">${manufacturer.state}</td>
 					<td class="leftNoBold">${manufacturer.zip}</td>
 					<td class="leftNoBold">${manufacturer.zipExt}</td>
-					<td class="leftNoBold"><input type="button" value="Update" onclick="javascript:jsManufacturerUorDSubmit('${pageContext.request.contextPath}/manufacturer/displayUpdateManufacturer','${manufacturer.manufacturerId}');" /></td>
-					<td class="leftNoBold"><input type="button" value="Delete" onclick="javascript:jsManufacturerUorDSubmit('${pageContext.request.contextPath}/manufacturer/displayDeleteManufacturer','${manufacturer.manufacturerId}');" /></td>											
+					<%
+						if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+					%>
+							<td class="leftNoBold"><input type="button" value="Update" onclick="javascript:jsManufacturerUorDSubmit('${pageContext.request.contextPath}/manufacturer/displayUpdateManufacturer','${manufacturer.manufacturerId}');" /></td>
+							<td class="leftNoBold"><input type="button" value="Delete" onclick="javascript:jsManufacturerUorDSubmit('${pageContext.request.contextPath}/manufacturer/displayDeleteManufacturer','${manufacturer.manufacturerId}');" /></td>
+					<%
+						}
+					%>											
 				</tr>																		
 			</c:forEach>								
-		</table>	
+		</table>
+		<c:if test="${manufacturerForm.pageResponseDto.totalPages > 1}">
+		    <div style="text-align:center;margin-top:20px;">
+		
+		        <!-- Previous -->
+		        <c:if test="${manufacturerForm.pageResponseDto.pageNumber > 0}">
+		            <a href="?page=${manufacturerForm.pageResponseDto.pageNumber - 1}&mfgName=${manufacturerForm.manufacturer.mfgName}">Previous</a>
+		        </c:if>
+		
+		        <!-- Page Numbers -->
+		        <c:forEach begin="0" end="${manufacturerForm.pageResponseDto.totalPages-1}" var="i">
+		            <c:choose>
+		                <c:when test="${i == manufacturerForm.pageResponseDto.pageNumber}">
+		                    <b>[${i+1}]</b>
+		                </c:when>
+		                <c:otherwise>
+		                    <a href="?page=${i}&mfgName=${manufacturerForm.manufacturer.mfgName}">${i+1}</a>
+		                </c:otherwise>
+		            </c:choose>
+		        </c:forEach>
+		
+		        <!-- Next -->
+		        <c:if test="${manufacturerForm.pageResponseDto.pageNumber < manufacturerForm.pageResponseDto.totalPages-1}">
+		            <a href="?page=${manufacturerForm.pageResponseDto.pageNumber + 1}&mfgName=${manufacturerForm.manufacturer.mfgName}">Next</a>
+		        </c:if>
+		
+		    </div>
+		</c:if>	
 	</c:if>
 	<input type="hidden" name="manufacturerId" />
 </form:form>

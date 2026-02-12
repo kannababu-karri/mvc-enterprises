@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ILabs: Manufacturer vs Product</title>
+<title>MVC-Microservices Application: Manufacturer vs Product</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />

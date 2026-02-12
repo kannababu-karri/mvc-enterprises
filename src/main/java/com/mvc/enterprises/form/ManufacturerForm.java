@@ -3,6 +3,7 @@ package com.mvc.enterprises.form;
 import java.util.List;
 
 import com.mvc.enterprises.entities.Manufacturer;
+import com.mvc.enterprises.entities.PageResponseDto;
 
 public class ManufacturerForm {
 	
@@ -10,6 +11,7 @@ public class ManufacturerForm {
     private boolean showDetails;
 	private Manufacturer manufacturer;
 	private Long manufacturerId;
+	private PageResponseDto<?> pageResponseDto;
 	
 	public List<Manufacturer> getResultManufacturers() {
 		return resultManufacturers;
@@ -34,5 +36,11 @@ public class ManufacturerForm {
 	}
 	public void setManufacturerId(Long manufacturerId) {
 		this.manufacturerId = manufacturerId;
+	}
+	public PageResponseDto<?> getPageResponseDto() {
+		return pageResponseDto;
+	}
+	public void setPageResponseDto(PageResponseDto<?> pageResponseDto) {
+		this.pageResponseDto = pageResponseDto;
 	}
 }

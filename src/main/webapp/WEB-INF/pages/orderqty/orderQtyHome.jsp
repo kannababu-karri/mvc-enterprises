@@ -1,11 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ page import="com.mvc.enterprises.utils.Utils" %>
+
+<%		
+	String userRole = Utils.getUserRole(request);
+%>
 
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ILabs: Order</title>
+<title>MVC-Microservices Application: Order</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />
@@ -23,7 +28,13 @@
 		</c:if>
 	</p>
 	<p>&nbsp;&nbsp;
-		<input type="button" value="Add Order" onclick="javascript:jsOrderQtySubmit('${pageContext.request.contextPath}/orderqty/displayNewOrderQty');" />&nbsp;
+		<%
+			if(Utils.getAdminRole().equalsIgnoreCase(userRole) || Utils.getUserRole().equalsIgnoreCase(userRole)) {
+		%>
+				<input type="button" value="Add Order" onclick="javascript:jsOrderQtySubmit('${pageContext.request.contextPath}/orderqty/displayNewOrderQty');" />&nbsp;
+		<%
+			}
+		%>
 		<input type="button" value="Return IL Home" onclick="javascript:jsOrderQtySubmit('${pageContext.request.contextPath}/orderqty/returnILHome');" />
 	</p>
 	
@@ -75,25 +86,41 @@
 		<p class="searchTitle">&nbsp;&nbsp;Order Search Results:</p>
 		<table class="searchDetail">			
 			<tr>
+				<th>Login id</th>				
+				<th>Role</th>
 				<th>Manufacturer name</th>				
 				<th>Product name</th>				
 				<th>Product description</th>
 				<th>Cas Number</th>
 				<th>Quantity</th>
 				<th>Status</th>
-				<th>Update</th>
-				<th>Delete</th>								
+				<%
+					if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+				%>
+						<th>Update</th>
+						<th>Delete</th>
+				<%
+					}
+				%>						
 			</tr>
 			<c:forEach items="${orderQtyForm.resultOrderQtys}" var="orderQty" varStatus="status">		
-				<tr class="detailData">		
+				<tr class="detailData">	
+					<td class="center">${orderQty.user.userName}</td>
+					<td class="center">${orderQty.user.role}</td>
 					<td class="center">${orderQty.manufacturer.mfgName}</td>						
 					<td class="center">${orderQty.product.productName}</td>
 					<td class="leftNoBold">${orderQty.product.productDescription}</td>
 					<td class="leftNoBold">${orderQty.product.casNumber}</td>
 					<td class="leftNoBold">${orderQty.quantity}</td>
 					<td class="leftNoBold">${orderQty.status}</td>
-					<td class="leftNoBold"><input type="button" value="Update" onclick="javascript:jsOrderQtyUorDSubmit('${pageContext.request.contextPath}/orderqty/displayUpdateOrderQty','${orderQty.orderId}');" /></td>
-					<td class="leftNoBold"><input type="button" value="Delete" onclick="javascript:jsOrderQtyUorDSubmit('${pageContext.request.contextPath}/orderqty/displayDeleteOrderQty','${orderQty.orderId}');" /></td>											
+					<%
+						if(Utils.getAdminRole().equalsIgnoreCase(userRole)) {
+					%>
+							<td class="leftNoBold"><input type="button" value="Update" onclick="javascript:jsOrderQtyUorDSubmit('${pageContext.request.contextPath}/orderqty/displayUpdateOrderQty','${orderQty.orderId}');" /></td>
+							<td class="leftNoBold"><input type="button" value="Delete" onclick="javascript:jsOrderQtyUorDSubmit('${pageContext.request.contextPath}/orderqty/displayDeleteOrderQty','${orderQty.orderId}');" /></td>											
+					<%
+						}
+					%>
 				</tr>																		
 			</c:forEach>								
 		</table>	

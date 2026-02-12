@@ -1,13 +1,13 @@
 package com.mvc.enterprises.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,9 +24,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.mvc.enterprises.entities.Manufacturer;
+import com.mvc.enterprises.entities.PageResponseDto;
 import com.mvc.enterprises.entities.User;
 import com.mvc.enterprises.form.ManufacturerForm;
 import com.mvc.enterprises.utils.ILConstants;
@@ -63,13 +66,17 @@ public class ManufacturerController {
     		value = "/showManufacturerDetails",
     		method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public String showManufacturerDetails(Model model, HttpServletRequest request)  {
+    //@PostMapping("/showManufacturerDetails")
+    public String showManufacturerDetails(
+    		@RequestParam(defaultValue = "0") int page,
+    		Model model, 
+    		HttpServletRequest request)  {
     	
     	_LOGGER.info(">>> Inside showManufacturerDetails. <<<");
     	
     	ManufacturerForm form = null;
     	try {
-    		form = getAllManufacturers(request.getSession());
+    		form = getAllManufacturers(request.getSession(), page);
     	} catch (Exception exp) {
     		form = new ManufacturerForm();
     		model.addAttribute("error", exp.getMessage());
@@ -89,17 +96,25 @@ public class ManufacturerController {
      * @param session
      * @return
      */
-    @PostMapping("/manufacturerSearch")
+    //@GetMapping("/manufacturerSearch")
+    @RequestMapping(
+    		value = "/manufacturerSearch",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
+    //@PostMapping("/manufacturerSearch")
     public String manufacturerSearch(@ModelAttribute("manufacturer") Manufacturer manufacturer, 
     										Model model,
-    										HttpSession session) {
+    										HttpSession session,
+    										@RequestParam(defaultValue = "0") int page) {
     	
     	_LOGGER.info(">>> Inside manufacturerSearch. <<<");
        	String manufacturerName = manufacturer.getMfgName();
        	
+       	manufacturer.setMfgName(manufacturerName);
+       	
        	_LOGGER.info(">>> Inside manufacturerSearch. <<<:"+"manufacturerName: "+manufacturerName);
  
-        List<Manufacturer> manufacturers = null;
+       	PageResponseDto<Manufacturer> pageDto = null;
         
         if (!StringUtility.isEmpty(manufacturerName)) {
         	//manufacturers = manufacturerService.findByManufacturerNameLike(manufacturerName.trim());
@@ -110,27 +125,39 @@ public class ManufacturerController {
         	uriVariables.put("mfgName", manufacturerName.trim());
             
         	String url = ILConstants.MICROSERVICE_RESTFUL_MANUFACTURER_URL+"/search/{mfgName}";
-
-            //Call REST API
-            //ResponseEntity<Manufacturer[]> response = restTemplate.getForEntity(url, Manufacturer[].class, entity, manufacturerName.trim());
-        	ResponseEntity<Manufacturer[]> response = restTemplate.exchange(
-        	        url,
-        	        HttpMethod.GET,
-        	        entity,
-        	        Manufacturer[].class,
-        	        uriVariables
-        	);	
         	
-
-            // Convert array to list
-            manufacturers = Arrays.asList(response.getBody());
+        	String urlBuilder = UriComponentsBuilder
+        	        .fromHttpUrl(url)
+        	        .queryParam("page", page)
+        	        .queryParam("size", 5)
+        	        .queryParam("sort", "mfgName")
+        	        .buildAndExpand(uriVariables)
+        	        .encode()
+        	        .toUriString();
+        	try {
+	            //Call REST API
+	            //ResponseEntity<Manufacturer[]> response = restTemplate.getForEntity(url, Manufacturer[].class, entity, manufacturerName.trim());
+	        	ResponseEntity<PageResponseDto<Manufacturer>> response = restTemplate.exchange(
+	        			urlBuilder,
+	        	        HttpMethod.GET,
+	        	        entity,
+	        	        new ParameterizedTypeReference<PageResponseDto<Manufacturer>>() {}
+	        	);	
+	
+	            // Convert array to list
+	        	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+	                pageDto = response.getBody();
+	            }
+        	 } catch (RestClientException ex) {
+				_LOGGER.error("Manufacturer search failed", ex);
+				model.addAttribute("error", "Unable to connect to manufacturer service.");
+        	 }
         } else {
         	//manufacturers = manufacturerService.findAllManufacturers();
-        	
     		//Call restful web service
     		//public ResponseEntity<List<Manufacturer>> getAll() {
         	try {
-        		manufacturers = getRestAllManufacturers(session);
+        		pageDto = getRestAllManufacturers(session, page);
         	} catch (Exception exp) {
         		model.addAttribute("error", exp.getMessage());
         	}
@@ -140,9 +167,10 @@ public class ManufacturerController {
 		
 		form.setManufacturer(manufacturer);
     	
-    	if(manufacturers != null && !manufacturers.isEmpty() && manufacturers.size() > 0) {
+    	if(pageDto != null) {
     		form.setShowDetails(true);
-    		form.setResultManufacturers(manufacturers);
+    		form.setResultManufacturers(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	} else {
     		model.addAttribute("error", "No manufacturers are find for selected criteria.");
     	}
@@ -160,7 +188,8 @@ public class ManufacturerController {
      * @param request
      * @return
      */
-    @GetMapping("/displayNewManufacturer")
+    //@GetMapping("/displayNewManufacturer")
+    @PostMapping("/displayNewManufacturer")
     public String displayNewManufacturer(Model model, HttpServletRequest request) {
     	_LOGGER.info(">>> Inside displayNewManufacturer. <<<");
     	
@@ -250,7 +279,7 @@ public class ManufacturerController {
 	    	if(result != null && result.getManufacturerId() > 0) {
 	    		
 	    		try {
-	    			form = getAllManufacturers(request.getSession());
+	    			form = getAllManufacturers(request.getSession(), 0);
 	    			model.addAttribute("msg", "Manufacturer added successfully.");
 	    		} catch (Exception exp) {
 	    			model.addAttribute("error", exp.getMessage());
@@ -276,7 +305,8 @@ public class ManufacturerController {
      * @param request
      * @return
      */
-    @GetMapping("/displayUpdateManufacturer")
+    //@GetMapping("/displayUpdateManufacturer")
+    @PostMapping("/displayUpdateManufacturer")
     public String displayUpdateManufacturer(@RequestParam("manufacturerId") Long manufacturerId, 
     										Model model,
     										HttpServletRequest request) {
@@ -381,7 +411,7 @@ public class ManufacturerController {
 		    	
 		    	if(result != null && result.getManufacturerId() > 0) {
 		    		try {
-		    			form = getAllManufacturers(request.getSession());
+		    			form = getAllManufacturers(request.getSession(),0);
 		    			model.addAttribute("msg", "Manufacturer updated successfully.");
 		    		} catch (Exception exp) {
 		    			model.addAttribute("error", exp.getMessage());
@@ -410,7 +440,8 @@ public class ManufacturerController {
      * @param request
      * @return
      */
-    @GetMapping("/displayDeleteManufacturer")
+    //@GetMapping("/displayDeleteManufacturer")
+    @PostMapping("/displayDeleteManufacturer")
     public String displayDeleteManufacturer(@RequestParam("manufacturerId") Long manufacturerId, 
     										Model model,
     										HttpServletRequest request) {
@@ -500,7 +531,7 @@ public class ManufacturerController {
 	    	
 	    	if(msg != null && !msg.isEmpty()) {
 	    		try {
-	   				form = getAllManufacturers(request.getSession());
+	   				form = getAllManufacturers(request.getSession(),0);
 	   				model.addAttribute("msg", "Manufacturer deleted successfully.");
 	   				model.addAttribute("manufacturerForm", form);
 			    	//User is save sent to user home
@@ -523,7 +554,8 @@ public class ManufacturerController {
      * @param session
      * @return
      */
-    @GetMapping("/returnILHome")
+    //@GetMapping("/returnILHome")
+    @PostMapping("/returnILHome")
     public String returnILHome(HttpSession session) {
     	User user = (User) session.getAttribute(Utils.getSessionLoginUserIdKey());
         if (user == null) {
@@ -535,7 +567,7 @@ public class ManufacturerController {
     /**
      * Retrieving all Manufacturers. This method is used in retrieve and save.
      */
-	private ManufacturerForm getAllManufacturers(HttpSession session) throws Exception {
+	private ManufacturerForm getAllManufacturers(HttpSession session, int page) throws Exception {
 		
 		_LOGGER.info(">>> Inside getAllManufacturers. <<<");
 		
@@ -544,15 +576,20 @@ public class ManufacturerController {
 		
 		//Call restful web service
 		//public ResponseEntity<List<Manufacturer>> getAll() {
-		List<Manufacturer> manufacturers = getRestAllManufacturers(session);
+		PageResponseDto<Manufacturer> pageDto = getRestAllManufacturers(session, page);
     		
 		ManufacturerForm form = new ManufacturerForm();
 		
 		form.setManufacturer(new Manufacturer());
     	
-    	if(!manufacturers.isEmpty() && manufacturers.size() > 0) {
+    	if(pageDto != null) {
+    		
+    		_LOGGER.info(">>> Inside getAllManufacturers. getTotalPages <<<"+pageDto.getTotalPages());
+    		_LOGGER.info(">>> Inside getAllManufacturers. getPageNumber<<<"+pageDto.getPageNumber());
+    		
     		form.setShowDetails(true);
-    		form.setResultManufacturers(manufacturers);
+    		form.setResultManufacturers(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	}
 		return form;
 	}
@@ -587,23 +624,32 @@ public class ManufacturerController {
 	 * Get all manufacturer from RESTFUL
 	 * @return
 	 */
-	private List<Manufacturer> getRestAllManufacturers(HttpSession session) throws Exception {
+	private PageResponseDto<Manufacturer> getRestAllManufacturers(HttpSession session, int page) throws Exception {
 		_LOGGER.info(">>> Inside getRestAllManufacturers. <<<");
+		
 		//Microservice endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_MANUFACTURER_URL;
 		
 		//ResponseEntity<Manufacturer[]> response = restTemplate.getForEntity(url, Manufacturer[].class, entity);
-		ResponseEntity<Manufacturer[]> response = null;
+		ResponseEntity<PageResponseDto<Manufacturer>> response = null;
 		
 		try {
 			HttpEntity<Void> entity = getJwtTokenToHttpRequest(session, null);
+			
+			String urlBuilder = UriComponentsBuilder
+			        .fromHttpUrl(url)
+			        .queryParam("page", page)
+			        .queryParam("size", 5)
+			        .queryParam("sort", "mfgName")
+			        .toUriString();
+			
 			response =
-		        restTemplate.exchange(
-		                url,
-		                HttpMethod.GET,
-		                entity,
-		                Manufacturer[].class
-		        );	
+			    restTemplate.exchange(
+			    		urlBuilder,
+			            HttpMethod.GET,
+			            entity,
+			            new ParameterizedTypeReference<PageResponseDto<Manufacturer>>() {}
+			    );	
 		} catch (Exception exp ) {
 			throw new Exception("Network Authentication Required");
 		}
@@ -614,7 +660,7 @@ public class ManufacturerController {
 			throw new Exception("Not Found");
 		}
 		
-		return Arrays.asList(response.getBody());
+		return response.getBody();
 	}
 	
 	/**

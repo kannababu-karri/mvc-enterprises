@@ -72,7 +72,7 @@ public class LoginController {
     @PostMapping("/login")
     public String validateLoginCredentials(@ModelAttribute("user") User user, 
     										Model model,
-    										HttpSession session) {
+    										HttpSession session) throws Exception {
     	
     	//StopWatch stopWatch = new StopWatch();
     	//stopWatch.start();
@@ -99,14 +99,20 @@ public class LoginController {
             _LOGGER.info(">>> Inside validateLoginCredentials. url:<<<"+url);
             //Call microservice
            
-            //Call REST API
-            ResponseEntity<User> response = restTemplate.getForEntity(
-	    		   url, 
-	    		   User.class, 
-	    		   userName.trim(),
-	    		   password.trim());
+            User authenticateUser = null;
             
-            User authenticateUser = response.getBody();
+            try {
+	            //Call REST API
+	            ResponseEntity<User> response = restTemplate.getForEntity(
+		    		   url, 
+		    		   User.class, 
+		    		   userName.trim(),
+		    		   password.trim());
+	            
+	             authenticateUser = response.getBody();
+            } catch (Exception exp) {
+            	model.addAttribute("error", "User not exists in the system. Enter valid User Id and Password. "+exp.getMessage());
+            }
 	        
 	        if(authenticateUser != null && authenticateUser.getUserId() > 0) {
         		session.setAttribute(Utils.getSessionLoginUserIdKey(), authenticateUser);
@@ -123,7 +129,7 @@ public class LoginController {
         		_LOGGER.info(">>> user.getUserId() > token <<<"+token);
         		
 	            //Get the keyvalue pait from service KeyValuePairService
-                Optional<KeyValuePair> result =keyValuePairService.getByKey("kanna");
+                Optional<KeyValuePair> result = keyValuePairService.getByKey("kanna");
                 _LOGGER.info("KeyValuePair fetched in LoginController: {}", 
                 		result.isPresent() ? result.get().toString() : "Not Found");  
                 

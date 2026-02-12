@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ILabs: Order</title>
+<title>MVC-Microservices Application: Order</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />
@@ -13,9 +13,9 @@
 <form:form action="${pageContext.request.contextPath}/orderqty/updateOrderQty" method="post" modelAttribute="orderQtyForm.orderQty" id="orderQtyForm">
 	<p class="searchTitle">&nbsp;&nbsp;Order Interface: Order Update</p>
 		<p class="searchTitle">
-		<c:if test="${not empty errors}">
+		<c:if test="${not empty error}">
 		    <ul style="color: red;">
-		        <c:forEach items="${errors}" var="err">
+		        <c:forEach items="${error}" var="err">
 		            <li>${err}</li>
 		        </c:forEach>
 		    </ul>

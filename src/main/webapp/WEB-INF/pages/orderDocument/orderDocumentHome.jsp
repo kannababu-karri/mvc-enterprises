@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ILabs: MongoDB</title>
+<title>MVC-Microservices Application: MongoDB</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />
@@ -14,9 +14,11 @@
 	<p class="searchTitle">&nbsp;&nbsp;MongoDB Interface: Home</p>
 		<p class="searchTitle">
 		<c:if test="${not empty error}">
-		    <div class="error-msg" style="color:red;">
-		        &nbsp;&nbsp;${error}
-		    </div>
+		    <ul style="color: red;">
+		        <c:forEach items="${error}" var="err">
+		            <li>${err}</li>
+		        </c:forEach>
+		    </ul>
 		</c:if>
 		<c:if test="${not empty msg}">
 		    <div style="color: green;"><b>&nbsp;&nbsp;${msg}</b></div>

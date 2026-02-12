@@ -7,7 +7,13 @@ table.headerMain {
 }
 
 table.headerMain tr.headerMainTr td.headerMainTd {
-	font: bold 3em arial, sans-serif;
+	font: bold 2em arial, sans-serif;
+	margin: 0px;
+	padding: 0;
+}
+
+table.headerMain tr.headerMainTr td.headerMainTdOneEm {
+	font: bold 1em arial, sans-serif;
 	margin: 0px;
 	padding: 0;
 }

@@ -1,4 +1,3 @@
-
 package com.mvc.enterprises.controller;
 
 import java.util.ArrayList;
@@ -28,9 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.mvc.enterprises.entities.Manufacturer;
 import com.mvc.enterprises.entities.OrderQty;
+import com.mvc.enterprises.entities.PageResponseDto;
 import com.mvc.enterprises.entities.Product;
 import com.mvc.enterprises.entities.User;
 import com.mvc.enterprises.form.OrderQtyForm;
@@ -306,7 +307,7 @@ public class OrderQtyController {
             _LOGGER.info(">>> saveNewOrderQty-->orderQtys.<<<: "+orderQtys);
        		
        		if(orderQtys != null && orderQtys.size() > 0) {
-       			errors.add("Order already existing in the system..");
+       			model.addAttribute("error", "Order already existing in the system.");
        		} else {
        			
        			_LOGGER.info(">>> saveNewOrderQty-->else.<<<: ");
@@ -369,7 +370,9 @@ public class OrderQtyController {
 		    		model.addAttribute("error", "Order not added into the system.");
 		    	}
        		}
-    	} 
+    	} else {
+    		model.addAttribute("error", errors);
+    	}
        	
        	if(!processValidation) {
     		retrieveForSelections(form, request);
@@ -378,8 +381,6 @@ public class OrderQtyController {
         	form.setProduct(orderQty.getProduct());
         	
         	form.getOrderQty().setQuantity(orderQty.getQuantity());
-        	
-           	model.addAttribute("error", errors);
     	}
        	model.addAttribute("orderQtyForm", form);
     	//If error display same page
@@ -658,11 +659,13 @@ public class OrderQtyController {
 		//Microservice endpoint
 		HttpEntity<Void> entity = getJwtTokenToHttpRequest(request.getSession(), null);
 		
-		String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL+"/userid/{userId}";
+		String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL;
+		if(!Utils.getAdminRole().equalsIgnoreCase(user.getRole().trim())) {	
+			uriVariables.put("userId", String.valueOf(user.getUserId()));
+			url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL+"/userid/{userId}";
+		}
         _LOGGER.info(">>> Inside getAllOrderQtys. url:<<<"+url);
-        
-        uriVariables.put("userId", String.valueOf(user.getUserId()));
-        
+ 
         //Call microservice
         ResponseEntity<List<OrderQty>> response = restTemplate.exchange(
         	   		url,
@@ -810,16 +813,24 @@ public class OrderQtyController {
 		String url = ILConstants.MICROSERVICE_RESTFUL_MANUFACTURER_URL;
 		
 		//ResponseEntity<Manufacturer[]> response = restTemplate.getForEntity(url, Manufacturer[].class, entity);
-		ResponseEntity<Manufacturer[]> response = null;
+		ResponseEntity<PageResponseDto<Manufacturer>> response = null;
 		
 		try {
 			HttpEntity<Void> entity = getJwtTokenToHttpRequest(session, null);
+			
+			String urlBuilder = UriComponentsBuilder
+			        .fromHttpUrl(url)
+			        .queryParam("page", 0)
+			        .queryParam("size", 1000)
+			        .queryParam("sort", "mfgName")
+			        .toUriString();
+			
 			response =
-		        restTemplate.exchange(
-		                url,
-		                HttpMethod.GET,
-		                entity,
-		                Manufacturer[].class
+				    restTemplate.exchange(
+				    		urlBuilder,
+				            HttpMethod.GET,
+				            entity,
+				            new ParameterizedTypeReference<PageResponseDto<Manufacturer>>() {}
 		        );	
 		} catch (Exception exp ) {
 			throw new Exception("Network Authentication Required");
@@ -831,7 +842,7 @@ public class OrderQtyController {
 			throw new Exception("Not Found");
 		}
 		
-		return Arrays.asList(response.getBody());
+		return response.getBody().getContent();
 	}
 	
 	/**
@@ -844,18 +855,25 @@ public class OrderQtyController {
 		//Microservice endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_PRODUCT_URL;
 		
-		ResponseEntity<Product[]> response = null;
+		ResponseEntity<PageResponseDto<Product>> response = null;
 		
 		try {
 			HttpEntity<Void> entity = getJwtTokenToHttpRequest(session, null);
 			_LOGGER.info(">>> Inside getRestAllProducts. before calling microservice.<<<");
-			response =
-		        restTemplate.exchange(
-		                url,
-		                HttpMethod.GET,
-		                entity,
-		                Product[].class
-		        );	
+			String urlBuilder = UriComponentsBuilder
+			        .fromHttpUrl(url)
+			        .queryParam("page", 0)
+			        .queryParam("size", 1000)
+			        .queryParam("sort", "productName")
+			        .toUriString();
+				
+				response =
+				    restTemplate.exchange(
+				    		urlBuilder,
+				            HttpMethod.GET,
+				            entity,
+				            new ParameterizedTypeReference<PageResponseDto<Product>>() {}
+				    );	
 			_LOGGER.info(">>> Inside getRestAllProducts. after calling microservice.<<<");
 		} catch (Exception exp) {
 			_LOGGER.info(">>> Inside getRestAllProducts exception. <<< "+exp.toString());
@@ -870,7 +888,7 @@ public class OrderQtyController {
 			throw new Exception("Not Found");
 		}
 		
-		return Arrays.asList(response.getBody());
+		return response.getBody().getContent();
 	}
 	
 	/**

@@ -8,30 +8,36 @@
 <link type="text/css" rel="stylesheet" href="<c:url value='/styles/main.css'/>" />
 <script type="text/javascript" src="<c:url value='/scripts/il-web.js'/>"></script>
 <table class="headerMain" >
-	<tr class="headerMainTr">
-		<td width="25%"><img src="<c:url value='/images/il.gif'/>" alt="innovareLabs" height="100"></td>
-		<td width="50%" align="center" class="headerMainTd" height="40%">Innovare Labs</td>
-		<td width="25%" height="40%">&nbsp;</td>
+	<tr>
+		<td width="100%" colspan="3"><hr /></td>
 	</tr>
-	<tr class="loginUserMainTr">
-		<td width="25%">&nbsp;</td>
-		<td width="50%" align="center" class="loginUserMainTd">
-			<%
-				if(!StringUtility.isEmpty(loginUser)) {
-			%>
-					Login User: <%= loginUser %>
-			<%
-				}
-			%>&nbsp;					
-		</td>
-		<td width="25%">
-			<%
-				if(!StringUtility.isEmpty(loginUser)) {
-			%>
-					<a href="<c:url value='/logout' />">Logout</a>
-			<%
-				}
-			%>&nbsp;
+	<tr class="headerMainTr">
+		<!-- <td width="25%"><img src="<c:url value='/images/il.gif'/>" alt="innovareLabs" height="100"></td> -->
+		<td width="25%" align="left" class="headerMainTdOneEm" height="30%">Kannababu Karri&nbsp;&nbsp;Version 1.0</td>
+		<td width="50%" align="center" class="headerMainTd" height="30%">MVC-Microservices Application</td>
+		<td width="25%" align="right" class="headerMainTdOneEm" height="30%">
+			<table class="headerMain" >
+				<tr>
+					<td width="70%" align="center">
+						<%
+							if(!StringUtility.isEmpty(loginUser)) {
+						%>
+								<b>User:</b> <%= loginUser %>&nbsp;&nbsp;<b>Role:</b> <%= Utils.getUserRole(request) %>
+						<%
+							}
+						%>
+					</td>
+					<td width="30%" align="center">
+						<%
+							if(!StringUtility.isEmpty(loginUser)) {
+						%>
+								<a href="<c:url value='/logout' />">Logout</a>
+						<%
+							}
+						%>
+					</td>
+				</tr>
+			</table>
 		</td>
 	</tr>
 	<tr>

@@ -2,6 +2,7 @@ package com.mvc.enterprises.form;
 
 import java.util.List;
 
+import com.mvc.enterprises.entities.PageResponseDto;
 import com.mvc.enterprises.entities.Product;
 
 public class ProductForm {
@@ -10,6 +11,7 @@ public class ProductForm {
     private boolean showDetails;
 	private Product product;
 	private Long ProductId;
+	private PageResponseDto<?> pageResponseDto;
 	
 	public List<Product> getResultProducts() {
 		return resultProducts;
@@ -34,5 +36,11 @@ public class ProductForm {
 	}
 	public void setProductId(Long productId) {
 		ProductId = productId;
+	}
+	public PageResponseDto<?> getPageResponseDto() {
+		return pageResponseDto;
+	}
+	public void setPageResponseDto(PageResponseDto<?> pageResponseDto) {
+		this.pageResponseDto = pageResponseDto;
 	}
 }

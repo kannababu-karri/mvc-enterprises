@@ -1,7 +1,6 @@
 package com.mvc.enterprises.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.mvc.enterprises.entities.PageResponseDto;
 import com.mvc.enterprises.entities.Product;
 import com.mvc.enterprises.entities.User;
 import com.mvc.enterprises.form.ProductForm;
@@ -63,9 +64,21 @@ public class ProductController {
     		value = "/showProductDetails",
     		method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public String showProductDetails(Model model, HttpServletRequest request) throws Exception {
+    public String showProductDetails(
+    		@RequestParam(defaultValue = "0") int page,
+    		Model model, 
+    		HttpServletRequest request) throws Exception {
+    	
     	_LOGGER.info(">>> Inside showProductDetails. <<<");
-    	ProductForm form = getAllProducts(request);
+    	
+    	ProductForm form = null;
+    	try {
+    		form = getAllProducts(request, page);
+    	} catch (Exception exp) {
+    		form = new ProductForm();
+    		model.addAttribute("error", exp.getMessage());
+    		return "redirect:returnILHome";
+    	}
     	
     	model.addAttribute("productForm", form);
     	
@@ -80,10 +93,15 @@ public class ProductController {
      * @param session
      * @return
      */
-    @PostMapping("/productSearch")
+    //@PostMapping("/productSearch")
+    @RequestMapping(
+    		value = "/productSearch",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
     public String productSearch(@ModelAttribute("product") Product product, 
     										Model model,
-    										HttpSession session) throws Exception {
+    										HttpSession session,
+    										@RequestParam(defaultValue = "0") int page) throws Exception {
     	
     	_LOGGER.info(">>> Inside showProductDetails. <<<");
      	
@@ -94,19 +112,25 @@ public class ProductController {
        	_LOGGER.info(">>> Inside showProductDetails. productName:<<<"+productName);
        	_LOGGER.info(">>> Inside showProductDetails. productDescription:<<<"+productDescription);
        	_LOGGER.info(">>> Inside showProductDetails. casNumber:<<<"+casNumber);
+       	
+       	product.setProductName(productName);
+       	product.setProductDescription(productDescription);
+       	product.setCasNumber(casNumber);
  
-        List<Product> products = null;
+        //List<Product> products = null;
         
 		//Microservice endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_PRODUCT_URL;
 		
-		ResponseEntity<List<Product>> response = null;	
+		ResponseEntity<PageResponseDto<Product>> response = null;	
 		
 		boolean exceptionThrow = false;
 		
 		Map<String, String> uriVariables = new HashMap<>();
 		//Microservice endpoint
 		HttpEntity<Void> entity = getJwtTokenToHttpRequest(session, null);
+		
+		PageResponseDto<Product> pageDto = null;
         
 		try {
 	        if (!StringUtility.isEmpty(productName) && !StringUtility.isEmpty(productDescription) && !StringUtility.isEmpty(casNumber)) {    	
@@ -120,72 +144,115 @@ public class ProductController {
 	            //url = url+"/search?name={"+productName+"}&description={"+productDescription+"}&casNumber={"+casNumber+"}";
 	            url = url+"/search?name={productName}&description={productDescription}&casNumber={casNumber}";
 	            _LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	            
+	            String urlBuilder = UriComponentsBuilder
+	        	        .fromHttpUrl(url)
+	        	        .queryParam("page", page)
+	        	        .queryParam("size", 5)
+	        	        .queryParam("sort", "productName")
+	        	        .buildAndExpand(uriVariables)
+	        	        .encode()
+	        	        .toUriString();
+	            
 	            //Call microservice
 	            response = restTemplate.exchange(
-		        	   		url,
-		        	        HttpMethod.GET,
-		        	        entity,
-		        	        new ParameterizedTypeReference<List<Product>>() {},
-		        	        uriVariables
-	            		);
+	        			urlBuilder,
+	        	        HttpMethod.GET,
+	        	        entity,
+	        	        new ParameterizedTypeReference<PageResponseDto<Product>>() {}
+	        	);	
 
 	        } else if (!StringUtility.isEmpty(productName)) {
 	        	//products = productService.findByProductNameLike(productName);
 	           	// Build URL with query parameters
 	            //url = url+"/search/productName/{"+productName+"}";
 	        	uriVariables.put("productName", productName.trim());
+	        	
 	        	url = url+"/search/productName/{productName}";
-	            _LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	            
+	        	_LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	            
+	            String urlBuilder = UriComponentsBuilder
+	        	        .fromHttpUrl(url)
+	        	        .queryParam("page", page)
+	        	        .queryParam("size", 5)
+	        	        .queryParam("sort", "productName")
+	        	        .buildAndExpand(uriVariables)
+	        	        .encode()
+	        	        .toUriString();
+	            
 	            //Call microservice
 	            response = restTemplate.exchange(
-			    	   		url,
-			    	        HttpMethod.GET,
-			    	        entity,
-			    	        new ParameterizedTypeReference<List<Product>>() {},
-			    	        uriVariables
-	            		);
+	        			urlBuilder,
+	        	        HttpMethod.GET,
+	        	        entity,
+	        	        new ParameterizedTypeReference<PageResponseDto<Product>>() {}
+	            	);	
 	        } else if (!StringUtility.isEmpty(productDescription)) {
 	        	//products = productService.findByProductDescriptionLike(productDescription);
 	           	// Build URL with query parameters
 	            //url = url+"/search/description/{"+productDescription+"}";
 	        	uriVariables.put("productDescription", productDescription.trim());
+	        	
 	        	url = url+"/search/description/{productDescription}";
-	            _LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	            
+	        	_LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	            
+	            String urlBuilder = UriComponentsBuilder
+	        	        .fromHttpUrl(url)
+	        	        .queryParam("page", page)
+	        	        .queryParam("size", 5)
+	        	        .queryParam("sort", "productName")
+	        	        .buildAndExpand(uriVariables)
+	        	        .encode()
+	        	        .toUriString();
+	            
 	            //Call microservice
 	            response = restTemplate.exchange(
-		    	   		url,
-		    	        HttpMethod.GET,
-		    	        entity,
-		    	        new ParameterizedTypeReference<List<Product>>() {},
-		    	        uriVariables
-            		);
+	        			urlBuilder,
+	        	        HttpMethod.GET,
+	        	        entity,
+	        	        new ParameterizedTypeReference<PageResponseDto<Product>>() {}
+	            	);	
 	        } else if (!StringUtility.isEmpty(casNumber)) {
 	        	//products = productService.findByCasNumberLike(casNumber);
 	           	// Build URL with query parameters
 	            //url = url+"/search/cas/{"+casNumber+"}";
 	        	uriVariables.put("casNumber", casNumber.trim());
+	        	
 	        	url = url+"/search/cas/{casNumber}";
-	            _LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	            
+	        	_LOGGER.info(">>> Inside showProductDetails. url:<<<"+url);
+	        	
+	        	String urlBuilder = UriComponentsBuilder
+	        	        .fromHttpUrl(url)
+	        	        .queryParam("page", page)
+	        	        .queryParam("size", 5)
+	        	        .queryParam("sort", "productName")
+	        	        .buildAndExpand(uriVariables)
+	        	        .encode()
+	        	        .toUriString();
+	        	
 	            //Call microservice
 	            response = restTemplate.exchange(
-		    	   		url,
-		    	        HttpMethod.GET,
-		    	        entity,
-		    	        new ParameterizedTypeReference<List<Product>>() {},
-		    	        uriVariables
-            		);
+	        			urlBuilder,
+	        	        HttpMethod.GET,
+	        	        entity,
+	        	        new ParameterizedTypeReference<PageResponseDto<Product>>() {}
+	            	);
 	        }
 	    } catch (Exception ex) {
 	    	exceptionThrow = true;
-	    	model.addAttribute("error", "No products are find for selected criteria.");
+	    	//model.addAttribute("error", "No products are find for selected criteria.");
+	    	model.addAttribute("error", "Unable to connect to product service.");
 	    }
         
         // Convert array to list
-        if(response != null) {
-        	products = response.getBody();
+		if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+			pageDto = response.getBody();
         } else {
         	if(!exceptionThrow) {
-        		products = getRestAllProducts(session);
+        		pageDto = getRestAllProducts(session, page);
         	}
         }
         
@@ -193,9 +260,10 @@ public class ProductController {
 		
 		form.setProduct(product);
     	
-    	if(products != null && !products.isEmpty() && products.size() > 0) {
+		if(pageDto != null && pageDto.getContent() != null && pageDto.getContent().size() > 0) {
     		form.setShowDetails(true);
-    		form.setResultProducts(products);
+    		form.setResultProducts(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	} else {
     		model.addAttribute("error", "No products are find for selected criteria.");
     	}
@@ -298,7 +366,7 @@ public class ProductController {
 	    	
 	    	if(result != null && result.getProductId() > 0) {
 	    	
-		    	form = getAllProducts(request);
+		    	form = getAllProducts(request, 0);
 		    	
 		    	model.addAttribute("productForm", form);
 		    	
@@ -450,7 +518,7 @@ public class ProductController {
        		
 			    	if(result != null && result.getProductId() > 0) {
 			    	
-				    	form = getAllProducts(request);
+				    	form = getAllProducts(request, 0);
 				    	
 				    	model.addAttribute("productForm", form);
 				    	
@@ -576,7 +644,7 @@ public class ProductController {
    			
 	    	
 	    	if(msg != null && !msg.isEmpty()) {
-	    		form = getAllProducts(request);
+	    		form = getAllProducts(request, 0);
 				model.addAttribute("msg", "Product deleted successfully.");
 				model.addAttribute("productForm", form);
 				
@@ -636,24 +704,32 @@ public class ProductController {
 	 * @return
 	 */
 
-	private List<Product> getRestAllProducts(HttpSession session) throws Exception {
+	private PageResponseDto<Product> getRestAllProducts(HttpSession session, int page) throws Exception {
 		_LOGGER.info(">>> Inside getRestAllProducts. <<<");
 		//Microservice endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_PRODUCT_URL;
 		
-		ResponseEntity<Product[]> response = null;
+		//ResponseEntity<Product[]> response = null;
+		ResponseEntity<PageResponseDto<Product>> response = null;
 		
 		try {
 			HttpEntity<Void> entity = getJwtTokenToHttpRequest(session, null);
-			_LOGGER.info(">>> Inside getRestAllProducts. before calling microservice.<<<");
+			
+			String urlBuilder = UriComponentsBuilder
+		        .fromHttpUrl(url)
+		        .queryParam("page", page)
+		        .queryParam("size", 5)
+		        .queryParam("sort", "productName")
+		        .toUriString();
+			
 			response =
-		        restTemplate.exchange(
-		                url,
-		                HttpMethod.GET,
-		                entity,
-		                Product[].class
-		        );	
-			_LOGGER.info(">>> Inside getRestAllProducts. after calling microservice.<<<");
+			    restTemplate.exchange(
+			    		urlBuilder,
+			            HttpMethod.GET,
+			            entity,
+			            new ParameterizedTypeReference<PageResponseDto<Product>>() {}
+			    );
+			
 		} catch (Exception exp) {
 			_LOGGER.info(">>> Inside getRestAllProducts exception. <<< "+exp.toString());
 			throw new Exception("Network Authentication Required");
@@ -667,23 +743,26 @@ public class ProductController {
 			throw new Exception("Not Found");
 		}
 		
-		return Arrays.asList(response.getBody());
+		return response.getBody();
 	}
 	
 
     /**
      * Retrieving all products. This method is used in retrieve and save.
      */
-	private ProductForm getAllProducts(HttpServletRequest request) throws Exception {
+	private ProductForm getAllProducts(HttpServletRequest request, int page) throws Exception {
 		
-		List<Product> products = getRestAllProducts(request.getSession());
+		PageResponseDto<Product> pageDto = getRestAllProducts(request.getSession(), page);
+		
+		//_LOGGER.info(">>> Inside getAllProducts pageDto.getContent(). <<< "+pageDto.getContent().size());
     	
 		ProductForm form = new ProductForm();
 		form.setProduct(new Product());
     	
-    	if(!products.isEmpty() && products.size() > 0) {
+		if(pageDto != null) {
     		form.setShowDetails(true);
-    		form.setResultProducts(products);
+    		form.setResultProducts(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	}
 		return form;
 	}

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mvc.enterprises</groupId>
-	<artifactId>ILabs</artifactId>
+	<artifactId>mvc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>ILabs</name>
+	<name>mvc</name>
 	<description>Spring Web application</description>
 	<url/>
 	<licenses>
@@ -182,7 +182,7 @@
 	</dependencies>
 
 	<build>
-	    <finalName>ILabs</finalName>
+	    <finalName>mvc</finalName>
 	    <plugins>
 	        <!-- WAR plugin -->
 	        <plugin>

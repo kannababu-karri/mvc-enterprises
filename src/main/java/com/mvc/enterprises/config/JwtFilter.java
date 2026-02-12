@@ -41,20 +41,20 @@ public class JwtFilter extends OncePerRequestFilter {
     	_LOGGER.info("Incoming request: " + uri);
     	
     	 //Allow login & static resources
-        if (uri.equals("/ILabs/login")
-        		|| uri.equals("/ILabs/loginHome")
-        		|| uri.equals("/ILabs/logout")
-                || uri.startsWith("/ILabs/styles/")
-                || uri.startsWith("/ILabs/scripts/")
-                || uri.startsWith("/ILabs/images/")) {
+        if (uri.equals("/mvc/login")
+        		|| uri.equals("/mvc/loginHome")
+        		|| uri.equals("/mvc/logout")
+                || uri.startsWith("/mvc/styles/")
+                || uri.startsWith("/mvc/scripts/")
+                || uri.startsWith("/mvc/images/")) {
         	
-        	_LOGGER.info("Inside if loop: " + uri);
+        	//_LOGGER.info("Inside if loop: " + uri);
 
             chain.doFilter(request, response);
             return;
         }
         
-        _LOGGER.info("Not in if condition");
+        //_LOGGER.info("Not in if condition");
         /*
         HttpSession session = request.getSession(false);
         String token = (session != null) ? 
@@ -81,9 +81,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
             //Extract username & roles from token
             String username = jwtUtil.extractUsername(token);
-            _LOGGER.info("JwtFilter: inside token username:"+username);
+            ///_LOGGER.info("JwtFilter: inside token username:"+username);
             List<String> roles = jwtUtil.extractRoles(token);
-            _LOGGER.info("JwtFilter: inside token roles:"+roles);
+            //_LOGGER.info("JwtFilter: inside token roles:"+roles);
 
             List<SimpleGrantedAuthority> authorities =
                     roles.stream()
@@ -118,12 +118,12 @@ public class JwtFilter extends OncePerRequestFilter {
         _LOGGER.info("Incoming request: " + uri);
 
         // allow login & static resources
-        if (uri.equals("/ILabs/login")
-        		|| uri.equals("/ILabs/loginHome")
-        		|| uri.equals("/ILabs/logout")
-                || uri.startsWith("/ILabs/styles/")
-                || uri.startsWith("/ILabs/scripts/")
-                || uri.startsWith("/ILabs/images/")) {
+        if (uri.equals("/mvc/login")
+        		|| uri.equals("/mvc/loginHome")
+        		|| uri.equals("/mvc/logout")
+                || uri.startsWith("/mvc/styles/")
+                || uri.startsWith("/mvc/scripts/")
+                || uri.startsWith("/mvc/images/")) {
         	_LOGGER.info("Allowed endpoint, passing through filter: " + uri);
             chain.doFilter(request, response);
             return;
