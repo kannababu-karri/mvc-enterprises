@@ -6,14 +6,14 @@
 	String loginUser = Utils.getLoginUserName(request);
 %>
 <link type="text/css" rel="stylesheet" href="<c:url value='/styles/main.css'/>" />
-<script type="text/javascript" src="<c:url value='/scripts/il-web.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/il-web.js?v=20260215'/>"></script>
 <table class="headerMain" >
 	<tr>
 		<td width="100%" colspan="3"><hr /></td>
 	</tr>
 	<tr class="headerMainTr">
 		<!-- <td width="25%"><img src="<c:url value='/images/il.gif'/>" alt="innovareLabs" height="100"></td> -->
-		<td width="25%" align="left" class="headerMainTdOneEm" height="30%">Kannababu Karri&nbsp;&nbsp;Version 1.0</td>
+		<td width="25%" align="left" class="headerMainTdOneEm" height="30%">Kannababu Karri&nbsp;&nbsp;Version 1.3</td>
 		<td width="50%" align="center" class="headerMainTd" height="30%">MVC-Microservices Application</td>
 		<td width="25%" align="right" class="headerMainTdOneEm" height="30%">
 			<table class="headerMain" >

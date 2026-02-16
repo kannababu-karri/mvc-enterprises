@@ -12,6 +12,7 @@ public final class ILConstants {
 	public static final String MICROSERVICE_RESTFUL_MANUFACTURER_URL ="http://localhost:8091/api/manufacturer";
 	public static final String MICROSERVICE_RESTFUL_PRODUCT_URL ="http://localhost:8092/api/product";
 	public static final String MICROSERVICE_RESTFUL_ORDERQTY_URL ="http://localhost:8093/api/orderqty";
+	public static final String MICROSERVICE_RESTFUL_AI_AGENT_URL ="http://localhost:8094/api/aiagent";
 	
 	//MongoDB Operations
 	public static final String MONGODB_OPERATION_SAVE = "SAVE";

@@ -135,3 +135,13 @@ table.searchGroupDetail tr.detailData td.leftNoBold {
     padding: 10px; /* replaces cellpadding */
     border: 0px solid #ddd; /* optional border */
 }
+
+div.ai-agent-report-box {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    white-space: pre-wrap; /* IMPORTANT */
+    font-family: Consolas, monospace;
+    max-height: 400px;      /* optional */
+    overflow-y: auto;      /* optional */
+}

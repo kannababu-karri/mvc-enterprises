@@ -106,6 +106,14 @@ function jsOrderDocumentSubmit(url) {
 	form.submit();       // submit the form
 }
 
+//User ai agent
+function jsAiAgentSubmit(url) {
+	const form = document.getElementById("aiAgentForm");
+	form.action = url;   // change form action to reset mapping
+	form.method = "post"; // reset can be GET
+	form.submit();       // submit the form
+}
+
 //User order document from file
 function jsFileReadSubmit(url) {
 	const form = document.getElementById("fileReadForm");

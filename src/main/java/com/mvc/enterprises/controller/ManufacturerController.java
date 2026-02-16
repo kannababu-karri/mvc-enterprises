@@ -557,6 +557,9 @@ public class ManufacturerController {
     //@GetMapping("/returnILHome")
     @PostMapping("/returnILHome")
     public String returnILHome(HttpSession session) {
+    	if(session == null) {
+    		return "forward:/login"; // forward if not logged in
+    	}
     	User user = (User) session.getAttribute(Utils.getSessionLoginUserIdKey());
         if (user == null) {
             return "forward:/login"; // forward if not logged in
