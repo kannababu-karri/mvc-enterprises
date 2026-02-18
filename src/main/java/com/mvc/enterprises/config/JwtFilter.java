@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
     	
     	 //Allow login & static resources
         if (uri.equals("/mvc/login")
-        		|| uri.equals("/mvc/loginHome")
+        		|| uri.equals("/mvc/login/reset")
         		|| uri.equals("/mvc/logout")
                 || uri.startsWith("/mvc/styles/")
                 || uri.startsWith("/mvc/scripts/")

@@ -24,7 +24,7 @@
 	</p>
 	<p>&nbsp;&nbsp;
 		<input type="button" value="Add Manufacturer vs Product" onclick="javascript:jsMfgvsproductSubmit('/mfgvsproduct/displayNewMfgvsproduct');" />&nbsp;
-		<input type="button" value="Return IL Home" onclick="javascript:jsMfgvsproductSubmit('/mfgvsproduct/returnILHome');" />
+		<input type="button" value="Return Home" onclick="javascript:jsMfgvsproductSubmit('/mfgvsproduct/returnILHome');" />
 	</p>
 	
 	<!-- global errors -->

@@ -37,7 +37,7 @@
 		<%
 			}
 		%>
-		<input type="button" value="Return IL Home" onclick="javascript:jsProductSubmit('${pageContext.request.contextPath}/product/returnILHome');" />
+		<input type="button" value="Return Home" onclick="javascript:jsProductSubmit('${pageContext.request.contextPath}/product/returnILHome');" />
 	</p>
 	
 	<!-- global errors -->

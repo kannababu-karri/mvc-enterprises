@@ -23,7 +23,7 @@
 		</c:if>
 	</p>
 	<p>&nbsp;&nbsp;
-		<input type="button" value="Return IL Home" onclick="javascript:jsFileReadSubmit('/fileRead/returnILHome');" />
+		<input type="button" value="Return Home" onclick="javascript:jsFileReadSubmit('/fileRead/returnILHome');" />
 	</p>
 	
 	<!-- global errors -->

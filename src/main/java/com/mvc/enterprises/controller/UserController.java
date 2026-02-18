@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,7 +106,7 @@ public class UserController {
      * @param request
      * @return
      */
-    @GetMapping("/displayNewUser")
+    @PostMapping("/displayNewUser")
     public String displayNewUser(Model model, HttpServletRequest request) {
     	User user = new User();
 
@@ -185,7 +184,7 @@ public class UserController {
      * @param request
      * @return
      */
-    @GetMapping("/displayUpdateUser")
+    @PostMapping("/displayUpdateUser")
     public String displayUpdateUser(@RequestParam("userId") Long userId, Model model) {
     	System.out.println("User ID display = " + userId);
     	User user = userService.findById(userId);
@@ -281,7 +280,7 @@ public class UserController {
      * @param request
      * @return
      */
-    @GetMapping("/displayDeleteUser")
+    @PostMapping("/displayDeleteUser")
     public String displayDeleteUser(@RequestParam("userId") Long userId, Model model) {
     	System.out.println("User ID display = " + userId);
     	User user = userService.findById(userId);
@@ -346,7 +345,7 @@ public class UserController {
      * @param session
      * @return
      */
-    @GetMapping("/returnILHome")
+    @PostMapping("/returnILHome")
     public String returnILHome(HttpSession session) {
     	if(session == null) {
     		return "forward:/login"; // forward if not logged in

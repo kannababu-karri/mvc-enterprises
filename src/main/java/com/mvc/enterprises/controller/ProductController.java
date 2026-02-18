@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -281,10 +280,10 @@ public class ProductController {
      * @param request
      * @return
      */
-    @GetMapping("/displayNewProduct")
-    public String displayNewManufacturer(Model model, HttpServletRequest request) {
+    @PostMapping("/displayNewProduct")
+    public String displayNewProduct(Model model, HttpServletRequest request) {
     	
-    	_LOGGER.info(">>> Inside displayNewManufacturer. <<<");
+    	_LOGGER.info(">>> Inside displayNewProduct. <<<");
     	
     	Product product = new Product();
 
@@ -390,7 +389,7 @@ public class ProductController {
      * @param request
      * @return
      */
-    @GetMapping("/displayUpdateProduct")
+    @PostMapping("/displayUpdateProduct")
     public String displayUpdateProduct(@RequestParam("productId") Long productId, 
     									Model model,
     									HttpServletRequest request) {
@@ -545,11 +544,10 @@ public class ProductController {
      * @param model
      * @return
      */
-    @GetMapping("/displayDeleteProduct")
+    @PostMapping("/displayDeleteProduct")
     public String displayDeleteProduct(@RequestParam("productId") Long productId, 
     									Model model,
     									HttpServletRequest request) {
-    	_LOGGER.info(">>> Inside displayDeleteProduct. <<<");
      	_LOGGER.info(">>> Inside displayDeleteProduct. <<<:"+"productId: "+productId);
     	
     	//Product product = productService.findByProductId(productId);
@@ -665,7 +663,7 @@ public class ProductController {
      * @param session
      * @return
      */
-    @GetMapping("/returnILHome")
+    @PostMapping("/returnILHome")
     public String returnILHome(HttpSession session) {
     	if(session == null) {
     		return "forward:/login"; // forward if not logged in

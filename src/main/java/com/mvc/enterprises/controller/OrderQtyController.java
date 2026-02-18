@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -231,7 +230,7 @@ public class OrderQtyController {
      * @param request
      * @return
      */
-    @GetMapping("/displayNewOrderQty")
+    @PostMapping("/displayNewOrderQty")
     public String displayNewOrderQty(Model model, HttpServletRequest request) throws Exception {
     	OrderQty orderQty = new OrderQty();
 
@@ -394,7 +393,7 @@ public class OrderQtyController {
      * @param request
      * @return
      */
-    @GetMapping("/displayUpdateOrderQty")
+    @PostMapping("/displayUpdateOrderQty")
     public String displayUpdateOrderQty(@RequestParam("orderId") Long orderId, 
     									Model model,
     									HttpServletRequest request) {
@@ -512,7 +511,7 @@ public class OrderQtyController {
      * @param model
      * @return
      */
-    @GetMapping("/displayDeleteOrderQty")
+    @PostMapping("/displayDeleteOrderQty")
     public String displayDeleteProduct(@RequestParam("orderId") Long orderId, 
     									Model model,
     									HttpServletRequest request) {
@@ -619,7 +618,7 @@ public class OrderQtyController {
      * @param session
      * @return
      */
-    @GetMapping("/returnILHome")
+    @PostMapping("/returnILHome")
     public String returnILHome(HttpSession session) {
     	if(session == null) {
     		return "forward:/login"; // forward if not logged in

@@ -1,7 +1,5 @@
 package com.mvc.enterprises.config;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.mvc.enterprises.utils.Utils;
 
@@ -52,7 +47,7 @@ public class SecurityConfig {
         return web -> web.ignoring()
                 .requestMatchers(
                         "/login",
-                        "/loginHome",
+                        "/login/reset",
                         "/logout",
                         "/WEB-INF/**",
                         "/styles/**",

@@ -26,7 +26,7 @@ function checkKeyNumberNoNegative(e) {
 function jsResetHome(url) {
 	const form = document.getElementById("loginForm");
 	form.action = url;   // change form action to reset mapping
-	form.method = "post"; // reset can be GET
+	form.method = "get"; // reset can be GET
 	form.submit();       // submit the form
 } 
 

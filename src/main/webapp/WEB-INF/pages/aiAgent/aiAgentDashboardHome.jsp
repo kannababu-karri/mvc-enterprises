@@ -32,7 +32,7 @@
     <c:if test="${not empty msg}">
         <div style="color: green;"><b>&nbsp;&nbsp;${msg}</b></div>
     </c:if>
-	<p class="searchTitle">&nbsp;&nbsp;<input type="button" value="Return IL Home" onclick="javascript:jsAiAgentSubmit('${pageContext.request.contextPath}/aiAgent/returnILHome');" /></p>
+	<p class="searchTitle">&nbsp;&nbsp;<input type="button" value="Return Home" onclick="javascript:jsAiAgentSubmit('${pageContext.request.contextPath}/aiAgent/returnILHome');" /></p>
 	<table class="searchDetail">			
 		<tr>
 			<th>Batch No</th>

@@ -2,7 +2,6 @@ package com.mvc.enterprises.controller;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,9 +23,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.client.RestTemplate;
@@ -36,7 +35,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mvc.enterprises.entities.BatchRecords;
-import com.mvc.enterprises.entities.ComplianceResults;
 import com.mvc.enterprises.entities.ComplianceResultsDto;
 import com.mvc.enterprises.entities.PageResponseDto;
 import com.mvc.enterprises.entities.User;
@@ -67,7 +65,10 @@ public class AiAgentController {
 	 * @param model
 	 * @return
 	 */
-	@GetMapping("/showAiAgent")
+    @RequestMapping(
+    		value = "/showAiAgent",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
 	public String showAiAgentCompliance(Model model, HttpServletRequest request) throws Exception {
 		return "aiAgent/aiAgentHome";
 	}
@@ -108,13 +109,16 @@ public class AiAgentController {
 	 * @param model
 	 * @return
 	 */
-	@GetMapping("/showAiAgentProcessBatch")
+    @RequestMapping(
+    		value = "/showAiAgentProcessBatch",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
 	public String showAiAgentProcessBatch(Model model, HttpServletRequest request) throws Exception {
 		return "aiAgent/aiAgentProcessBatchHome";
 	}
 
-	@PostMapping("/showAiAgentProcessBatch")
-	public String showAiAgentProcessBatch(@RequestParam("batchNo") String batchNo,
+	@PostMapping("/aiAgentProcessBatch")
+	public String aiAgentProcessBatch(@RequestParam("batchNo") String batchNo,
 			@RequestParam("productName") String productName, @RequestParam("file") MultipartFile file,
 			HttpSession session, Model model) {
 
@@ -145,8 +149,11 @@ public class AiAgentController {
 
 		return "aiAgent/aiAgentProcessBatchHome";
 	}
-	
-	@GetMapping("/showAiAgentDashboard")
+
+	@RequestMapping(
+    		value = "/showAiAgentDashboard",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
 	public String showDashboard(
 			@RequestParam(defaultValue = "0") int page,
 			Model model, 

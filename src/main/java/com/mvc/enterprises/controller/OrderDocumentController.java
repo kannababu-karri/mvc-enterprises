@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -270,7 +269,7 @@ public class OrderDocumentController {
      * @param session
      * @return
      */
-    @GetMapping("/returnILHome")
+	@PostMapping("/returnILHome")
     public String returnILHome(HttpSession session) {
     	if(session == null) {
     		return "forward:/login"; // forward if not logged in

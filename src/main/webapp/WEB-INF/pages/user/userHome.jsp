@@ -24,7 +24,7 @@
 	</p>
 	<p>&nbsp;&nbsp;
 		<input type="button" value="Add User" onclick="javascript:jsUserSubmit('/user/displayNewUser');" />&nbsp;
-		<input type="button" value="Return IL Home" onclick="javascript:jsUserSubmit('/user/returnILHome');" />
+		<input type="button" value="Return Home" onclick="javascript:jsUserSubmit('/user/returnILHome');" />
 	</p>
 	
 	<!-- global errors -->

@@ -25,7 +25,7 @@
 		</c:if>
 	</p>
 	<p>&nbsp;&nbsp;
-		<input type="button" value="Return IL Home" onclick="javascript:jsOrderDocumentSubmit('${pageContext.request.contextPath}/orderDocument/returnILHome');" />
+		<input type="button" value="Return Home" onclick="javascript:jsOrderDocumentSubmit('${pageContext.request.contextPath}/orderDocument/returnILHome');" />
 	</p>
 	
 	<!-- global errors -->

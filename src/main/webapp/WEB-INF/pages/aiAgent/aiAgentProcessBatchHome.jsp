@@ -15,7 +15,7 @@
 <body>
 <jsp:include page="/WEB-INF/pages/common/header.jsp" flush="true" />
 
-<form:form action="${pageContext.request.contextPath}/aiAgent/showAiAgentProcessBatch" method="post"  id="aiAgentForm" enctype="multipart/form-data">
+<form:form action="${pageContext.request.contextPath}/aiAgent/aiAgentProcessBatch" method="post"  id="aiAgentForm" enctype="multipart/form-data">
 	<p class="searchTitle">&nbsp;&nbsp;AI Agent Interface: Home</p>
 	<p class="searchTitle">&nbsp;&nbsp;Regulatory compliance details are saved into database and results are displayed in the page.</p>
 
@@ -62,7 +62,7 @@
         <tr>
             <td colspan="4" align="center" style="padding-top:10px;">
                 <input type="submit" value="Submit" />
-                <input type="button" value="Return IL Home" onclick="javascript:jsAiAgentSubmit('${pageContext.request.contextPath}/aiAgent/returnILHome');" />
+                <input type="button" value="Return Home" onclick="javascript:jsAiAgentSubmit('${pageContext.request.contextPath}/aiAgent/returnILHome');" />
             </td>
         </tr>
     </table>

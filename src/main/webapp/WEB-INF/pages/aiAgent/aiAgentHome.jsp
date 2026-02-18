@@ -43,7 +43,7 @@
         <tr>
             <td colspan="4" align="center" style="padding-top:10px;">
                 <input type="submit" value="Submit" />
-                <input type="button" value="Return IL Home" onclick="javascript:jsAiAgentSubmit('${pageContext.request.contextPath}/aiAgent/returnILHome');" />
+                <input type="button" value="Return Home" onclick="javascript:jsAiAgentSubmit('${pageContext.request.contextPath}/aiAgent/returnILHome');" />
             </td>
         </tr>
     </table>

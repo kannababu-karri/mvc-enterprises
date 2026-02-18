@@ -35,7 +35,7 @@
 		<%
 			}
 		%>
-		<input type="button" value="Return IL Home" onclick="javascript:jsOrderQtySubmit('${pageContext.request.contextPath}/orderqty/returnILHome');" />
+		<input type="button" value="Return Home" onclick="javascript:jsOrderQtySubmit('${pageContext.request.contextPath}/orderqty/returnILHome');" />
 	</p>
 	
 	<!-- global errors -->

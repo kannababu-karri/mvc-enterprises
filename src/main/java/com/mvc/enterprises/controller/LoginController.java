@@ -58,7 +58,7 @@ public class LoginController {
     @GetMapping("/login")
     public String loginPage(Model model) {
     	model.addAttribute("user", new User());
-        return "loginHome";
+    	return "login";
     }
 
     /**
@@ -156,12 +156,12 @@ public class LoginController {
                 
                 //_LOGGER.info(">>> validateLoginCredentials: process time: <<< "+stopWatch.getTotalTimeMillis() +" ms");
                         
-                return "redirect:ilHome";
+                return "redirect:/ilHome";
         	} else {
         		model.addAttribute("error", "User not exists in the system. Enter valid User Id and Password.");
         	}
     	}
-        return "loginHome"; // go back to login page
+        return "login"; // go back to login page
     }
 
     /**
@@ -172,8 +172,8 @@ public class LoginController {
      */
     @GetMapping("/ilHome")
     public String ilHomePage(HttpSession session) {
-    	if(session == null) {
-    		return "forward:/login"; // forward if not logged in
+    	if (session == null) {
+    	    return "redirect:/login";
     	}
     	User user = (User) session.getAttribute(Utils.getSessionLoginUserIdKey());
         if (user == null) {
