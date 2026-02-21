@@ -78,6 +78,7 @@ public class OrderQtyController {
         return "orderqty/orderQtyHome";
     }
     
+    
     /**
      * Submit the Order Qty search page
      * 
@@ -87,7 +88,7 @@ public class OrderQtyController {
      * @return
      */
     @PostMapping("/orderQtySearch")
-    public String orderQtySearch(@ModelAttribute("orderqty") OrderQty orderQty, 
+    public String search(@ModelAttribute("orderqty") OrderQty orderQty, 
     										Model model,
     										HttpServletRequest request) throws Exception  {
     	
@@ -104,109 +105,54 @@ public class OrderQtyController {
        	
 		//Microservice endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL;
-		ResponseEntity<List<OrderQty>> response = null;
- 
-        List<OrderQty> orderQtys = null;
+		ResponseEntity<PageResponseDto<OrderQty>> response = null;
         
-        boolean exceptionThrow = false;
+        PageResponseDto<OrderQty> pageDto = null;
         
 		Map<String, String> uriVariables = new HashMap<>();
-		//Microservice endpoint
+		
 		HttpEntity<Void> entity = getJwtTokenToHttpRequest(request.getSession(), null);
         
         try {
-	        if (manufacturerId != null && manufacturerId.longValue() > 0 && productId != null && productId.longValue() > 0) {
-	        	//orderQtys = orderQtyService.findByManufacturer_ManufacturerIdAndProduct_ProductIdAndUser_UserId(manufacturerId, productId, userId);
-	        	//url = url+"/search/mfgproductuser?manufacturerId={"+manufacturerId+"}&productId={"+productId+"}&userId={"+userId+"}";
-	            
-	            uriVariables.put("manufacturerId", String.valueOf(manufacturerId));
-	        	uriVariables.put("productId", String.valueOf(productId));
-	        	uriVariables.put("userId", String.valueOf(userId));
-	        	
-	        	url = url+"/search/mfgproductuser?manufacturerId={manufacturerId}&productId={productId}&userId={userId}";
-	        	_LOGGER.info(">>> Inside orderQtySearch. url:<<<"+url);
-	        	
-	            //Call microservice
-	            response = restTemplate.exchange(
-		        	   		url,
-		        	        HttpMethod.GET,
-		        	        entity,
-		        	        new ParameterizedTypeReference<List<OrderQty>>() {},
-		        	        uriVariables
-	            		);
-	        } else if (manufacturerId != null && manufacturerId.longValue() > 0) {
-	        	//orderQtys = orderQtyService.findByManufacturer_ManufacturerIdAndUser_UserId(manufacturerId, userId);
-	        	//url = url+"/search/mfguser?manufacturerId={"+manufacturerId+"}&userId={"+userId+"}";
-	        	url = url+"/search/mfguser?manufacturerId={manufacturerId}&userId={userId}";
-	            _LOGGER.info(">>> Inside orderQtySearch. url:<<<"+url);
-	            
-	            uriVariables.put("manufacturerId", String.valueOf(manufacturerId));
-	        	uriVariables.put("userId", String.valueOf(userId));
-	            
-	        	//Call microservice
-	            response = restTemplate.exchange(
-		        	   		url,
-		        	        HttpMethod.GET,
-		        	        entity,
-		        	        new ParameterizedTypeReference<List<OrderQty>>() {},
-		        	        uriVariables
-	            		);
-	        } else if (productId != null && productId.longValue() > 0) {
-	        	//orderQtys = orderQtyService.findByProduct_ProductIdAndUser_UserId(productId, userId);
-	        	//url = url+"/search/productuser?productId={"+productId+"}&userId={"+userId+"}";
-	        	url = url+"/search/productuser?productId={productId}&userId={userId}";
-	            _LOGGER.info(">>> Inside orderQtySearch. url:<<<"+url);
-	            
-	            uriVariables.put("productId", String.valueOf(productId));
-	        	uriVariables.put("userId", String.valueOf(userId));
-	            
-	        	//Call microservice
-	            response = restTemplate.exchange(
-		        	   		url,
-		        	        HttpMethod.GET,
-		        	        entity,
-		        	        new ParameterizedTypeReference<List<OrderQty>>() {},
-		        	        uriVariables
-	            		);
-	        } else {
-	        	//orderQtys = orderQtyService.findByUser_UserId(userId);
-	        	// Build URL with query parameters
-	            url = url+"/userid/{userId}";
-	            _LOGGER.info(">>> Inside orderQtySearch. url:<<<"+url);
-	            
-	            uriVariables.put("userId", String.valueOf(userId));
-	            
-	            //Call microservice
-	            response = restTemplate.exchange(
-		        	   		url,
-		        	        HttpMethod.GET,
-		        	        entity,
-		        	        new ParameterizedTypeReference<List<OrderQty>>() {},
-		        	        uriVariables
-	            		);
-	        }
+        	uriVariables.put("manufacturerId", String.valueOf(manufacturerId));
+        	uriVariables.put("productId", String.valueOf(productId));
+        	uriVariables.put("userId", String.valueOf(userId));
+        	
+        	if(manufacturerId == null) {
+        		manufacturerId = Long.valueOf("0");
+        	}
+        	
+        	if(productId == null) {
+        		productId = Long.valueOf("0");
+        	}
+	        
+        	url = url+"/search?manufacturerId="+manufacturerId+"&productId="+productId+"&userId="+userId;
+        	_LOGGER.info(">>> Inside orderQtySearch. url:<<<"+url);
+        	
+            //Call microservice
+            response = restTemplate.exchange(
+	        	   		url,
+	        	        HttpMethod.GET,
+	        	        entity,
+	        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {},
+	        	        uriVariables
+            		);
 	    } catch (Exception ex) {
-	    	exceptionThrow = true;
 	    	model.addAttribute("error", "No orders are find for selected criteria.");
 	    }
-        
-        
-        // Convert array to list
-        if(response != null) {
-        	orderQtys = response.getBody();
-        } else {
-        	if(!exceptionThrow) {
-        		orderQtys = getRestAllOrderQtys(request.getSession());
-        	}
-        }
         
         OrderQtyForm form = new OrderQtyForm();
 		
 		form.setOrderQty(orderQty);
+		
+		// Convert array to list
+    	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            pageDto = response.getBody();
+        }
     	
-    	if(orderQtys != null && !orderQtys.isEmpty() && orderQtys.size() > 0) {
+    	if(pageDto != null && pageDto.getContent() != null && pageDto.getContent().size() > 0) {
     		form.setShowDetails(true);
-    		form.setResultOrderQtys(orderQtys);
+    		form.setResultOrderQtys(pageDto.getContent());
     	} else {
     		model.addAttribute("error", "No orders are find for selected criteria.");
     	}
@@ -277,31 +223,31 @@ public class OrderQtyController {
     		Map<String, String> uriVariables = new HashMap<>();
     		//Microservice endpoint
     		HttpEntity<Void> entity = getJwtTokenToHttpRequest(request.getSession(), null);
-       		
-       		//Find out already order qty exists
-       		//List<OrderQty> orderQtys = orderQtyService.findByManufacturer_ManufacturerIdAndProduct_ProductIdAndUser_UserId(
-       		//		orderQty.getManufacturer().getManufacturerId(), 
-       		//		orderQty.getProduct().getProductId(), 
-       		//		user.getUserId());
-       		//Call microservice
+  
        		uriVariables.put("manufacturerId", String.valueOf(orderQty.getManufacturer().getManufacturerId()));
         	uriVariables.put("productId", String.valueOf(orderQty.getProduct().getProductId()));
         	uriVariables.put("userId", String.valueOf(user.getUserId()));
         	
-        	url = url+"/search/mfgproductuser?manufacturerId={manufacturerId}&productId={productId}&userId={userId}";
+        	url = url+"/search?manufacturerId={manufacturerId}&productId={productId}&userId={userId}";
         	_LOGGER.info(">>> Inside saveNewOrderQty. url:<<<"+url);
     		
     		//Call REST API
-	        ResponseEntity<List<OrderQty>> response = 
+        	ResponseEntity<PageResponseDto<OrderQty>> response = 
 	        		restTemplate.exchange(
 	        				url, 
 			        		HttpMethod.GET,
 		        	        entity,
-		        	        new ParameterizedTypeReference<List<OrderQty>>() {},
+		        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {},
 		        	        uriVariables
 	        			);
+        	
+        	// Convert array to list
+        	PageResponseDto<OrderQty> pageDto = null;
+        	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                pageDto = response.getBody();
+            }
     		
-            List<OrderQty> orderQtys = response.getBody();
+            List<OrderQty> orderQtys = pageDto.getContent();
             
             _LOGGER.info(">>> saveNewOrderQty-->orderQtys.<<<: "+orderQtys);
        		
@@ -463,11 +409,11 @@ public class OrderQtyController {
        		//OrderQty result = restTemplate.postForObject(ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL, existingOrderQty, OrderQty.class);
        		
        		//Microservice endpoint
-   			String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL;
+   			String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL + "/" + existingOrderQty.getOrderId();
             // Call microservice POST endpoint
    			ResponseEntity<OrderQty> response = restTemplate.exchange(
                     url,
-                    HttpMethod.POST,
+                    HttpMethod.PUT,
                     httpEntityPost,
                     OrderQty.class,
                     existingOrderQty
@@ -654,42 +600,40 @@ public class OrderQtyController {
 		
 		_LOGGER.info("user.getUserId()"+user.getUserId());
 		
-		//List<OrderQty> orderQtys = orderQtyService.findByUser_UserId(user.getUserId());
-		List<OrderQty> orderQtys = null;
-		
 		Map<String, String> uriVariables = new HashMap<>();
-		//Microservice endpoint
+		
 		HttpEntity<Void> entity = getJwtTokenToHttpRequest(request.getSession(), null);
+		
+		PageResponseDto<OrderQty> pageDto = null;
 		
 		String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL;
 		if(!Utils.getAdminRole().equalsIgnoreCase(user.getRole().trim())) {	
 			uriVariables.put("userId", String.valueOf(user.getUserId()));
-			url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL+"/userid/{userId}";
+			//url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL+"/userid/{userId}";
+			url = url+"/search?manufacturerId=0&productId=0&userId={userId}"; 
 		}
         _LOGGER.info(">>> Inside getAllOrderQtys. url:<<<"+url);
- 
-        //Call microservice
-        ResponseEntity<List<OrderQty>> response = restTemplate.exchange(
+        
+        ResponseEntity<PageResponseDto<OrderQty>> response = restTemplate.exchange(
         	   		url,
         	        HttpMethod.GET,
         	        entity,
-        	        new ParameterizedTypeReference<List<OrderQty>>() {},
+        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {},
         	        uriVariables
         		);
         
-        orderQtys = response.getBody();
-		
-		if(orderQtys != null && orderQtys.size() > 0) {
-			_LOGGER.info("orderQtys.size()"+orderQtys.size());
-		}
+        //Convert array to list
+    	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            pageDto = response.getBody();
+        }
     		
 		OrderQtyForm form = new OrderQtyForm();
 		
 		form.setOrderQty(new OrderQty());
     	
-    	if(!orderQtys.isEmpty() && orderQtys.size() > 0) {
+		if(pageDto != null && pageDto.getContent() != null && pageDto.getContent().size() > 0) {
     		form.setShowDetails(true);
-    		form.setResultOrderQtys(orderQtys);
+    		form.setResultOrderQtys(pageDto.getContent());
     	}
     	_LOGGER.info(">>> Inside getAllOrderQtys. END <<<");
 		return form;

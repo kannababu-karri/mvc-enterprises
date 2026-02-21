@@ -76,33 +76,30 @@ public class OrderDocumentController {
     	
     	HttpEntity<Void> entity = getJwtTokenToHttpRequest(request.getSession(), null);
     	
-    	ResponseEntity<List<OrderDocument>> response = null;
+    	ResponseEntity<PageResponseDto<OrderDocument>> response = null;
+    	
+    	PageResponseDto<OrderDocument> pageDto = null;
     	
     	try {
     		Map<String, String> uriVariables = new HashMap<>();
 	    	if(Utils.getAdminRole().equalsIgnoreCase(user.getRole())) {
-	    		url = url+"/allmongousers";
+	    		url = url+"/searchmongo?manufacturerId=0&productId=0&userId=0";
 	    		_LOGGER.info(">>> Inside showMongoDbDetails. inside if url:<<<"+url);
-	    		response = restTemplate.exchange(
-	        	   		url,
-	        	        HttpMethod.GET,
-	        	        entity,
-	        	        new ParameterizedTypeReference<List<OrderDocument>>() {},
-	        	        uriVariables
-            		);
+	    		
 	    	} else {
-	    		url = url+"/mongouserid/{userId}";
+	    		url = url+"/searchmongo?manufacturerId=0&productId=0&userId={userId}";
 	    		_LOGGER.info(">>> Inside showMongoDbDetails. inside else url:<<<"+url);
 	    		//Call REST API WITH headers
 	    		uriVariables.put("userId", String.valueOf(user.getUserId()));
-	    		response = restTemplate.exchange(
-	        	   		url,
-	        	        HttpMethod.GET,
-	        	        entity,
-	        	        new ParameterizedTypeReference<List<OrderDocument>>() {},
-	        	        uriVariables
-            		);
 	    	}
+	    	
+    		response = restTemplate.exchange(
+        	   		url,
+        	        HttpMethod.GET,
+        	        entity,
+        	        new ParameterizedTypeReference<PageResponseDto<OrderDocument>>() {},
+        	        uriVariables
+        		);
 		} catch (Exception exp ) {
 			_LOGGER.error("Error:"+exp.toString());
 			//throw new Exception("Network Authentication Required");
@@ -119,7 +116,11 @@ public class OrderDocumentController {
 			//throw new Exception("Not Found");
 		}
 		
-		List<OrderDocument> orderDocuments = response.getBody();
+		// Convert array to list
+    	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            pageDto = response.getBody();
+        }
+		List<OrderDocument> orderDocuments = pageDto.getContent();
 		
 		if(!orderDocuments.isEmpty() && orderDocuments.size() > 0) {
 			_LOGGER.info("showMongoDbDetails orderDocuments: "+orderDocuments.size());
@@ -171,11 +172,13 @@ public class OrderDocumentController {
        	_LOGGER.info("productId: "+productId);
        	_LOGGER.info("userId: "+userId);
  
-        List<OrderDocument> orderDocuments = null;
+       	ResponseEntity<PageResponseDto<OrderDocument>> response = null;
+    	
+    	PageResponseDto<OrderDocument> pageDto = null;
+    	
         
 		//Microservice endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL;
-		ResponseEntity<List<OrderDocument>> response = null;
 		
 		Map<String, String> uriVariables = new HashMap<>();
 		//Microservice endpoint
@@ -201,7 +204,7 @@ public class OrderDocumentController {
 				uriVariables.put("userId", "0");
 			}
         	
-        	url = url+"/searchmongo/mfgproductuser?manufacturerId={manufacturerId}&productId={productId}&userId={userId}";
+        	url = url+"/searchmongo?manufacturerId={manufacturerId}&productId={productId}&userId={userId}";
         	_LOGGER.info(">>> Inside orderDocumentSearch. url:<<<"+url);
         	
             //Call microservice
@@ -209,22 +212,24 @@ public class OrderDocumentController {
 	        	   		url,
 	        	        HttpMethod.GET,
 	        	        entity,
-	        	        new ParameterizedTypeReference<List<OrderDocument>>() {},
+	        	        new ParameterizedTypeReference<PageResponseDto<OrderDocument>>() {},
 	        	        uriVariables
             		);
+            // Convert array to list
+        	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                pageDto = response.getBody();
+            }
 	    } catch (Exception ex) {
 	    	model.addAttribute("error", "No order documents are find for selected criteria.");
 	    }
-        
-		orderDocuments = response.getBody();
 		
         //OrderDocumentForm form = new OrderDocumentForm();
    	
 		//form.setOrderDocument(orderDocument);
     	
-    	if(!orderDocuments.isEmpty() && orderDocuments.size() > 0) {
+    	if(pageDto != null) {
     		form.setShowDetails(true);
-    		form.setResultOrderDocuments(orderDocuments);
+    		form.setResultOrderDocuments(pageDto.getContent());
     	} else {
     		model.addAttribute("error", "No orders are find for selected criteria.");
     	}
