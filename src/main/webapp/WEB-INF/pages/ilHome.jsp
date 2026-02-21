@@ -72,9 +72,10 @@
 													automated audit reports through RESTful communication. Created regulatory compliance dashboard.
 						</td>
 					</tr>
+					<!-- 
 					<tr>
 						<td width="100%" align="left"><a href="${pageContext.request.contextPath}/aiAgent/showAiAgent"><b>Only Display Regulatory Compliance</b></a>&nbsp;&nbsp;<b>(AI Agent->Spring Boot->Microservice->Python AI API Service)</b></td>			
-					</tr>
+					</tr>  -->
 					<tr>
 						<td width="100%" align="left"><a href="${pageContext.request.contextPath}/aiAgent/showAiAgentProcessBatch"><b>Save/Display Regulatory Compliance</b></a>&nbsp;&nbsp;<b>(AI Agent->Spring Boot->Microservice->Python AI API Service)</b></td>			
 					</tr>

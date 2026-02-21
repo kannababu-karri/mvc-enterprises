@@ -123,7 +123,30 @@
 					%>
 				</tr>																		
 			</c:forEach>								
-		</table>	
+		</table>
+		<c:if test="${orderQtyForm.pageResponseDto.totalPages > 1}">
+		    <div style="text-align:center;margin-top:20px;">
+		        <!-- Previous -->
+		        <c:if test="${orderQtyForm.pageResponseDto.pageNumber > 0}">
+		            <a href="?page=${orderQtyForm.pageResponseDto.pageNumber - 1}&manufacturer.manufacturerId=${orderQtyForm.manufacturer.manufacturerId}&product.productId=${orderQtyForm.product.productId}">Previous</a>
+		        </c:if>		
+		        <!-- Page Numbers -->
+		        <c:forEach begin="0" end="${orderQtyForm.pageResponseDto.totalPages-1}" var="i">
+		            <c:choose>
+		                <c:when test="${i == orderQtyForm.pageResponseDto.pageNumber}">
+		                    <b>[${i+1}]</b>
+		                </c:when>
+		                <c:otherwise>
+		                    <a href="?page=${i}&manufacturer.manufacturerId=${orderQtyForm.manufacturer.manufacturerId}&product.productId=${orderQtyForm.product.productId}">${i+1}</a>
+		                </c:otherwise>
+		            </c:choose>
+		        </c:forEach>		
+		        <!-- Next -->
+		        <c:if test="${orderQtyForm.pageResponseDto.pageNumber < orderQtyForm.pageResponseDto.totalPages-1}">
+		            <a href="?page=${orderQtyForm.pageResponseDto.pageNumber + 1}&manufacturer.manufacturerId=${orderQtyForm.manufacturer.manufacturerId}&product.productId=${orderQtyForm.product.productId}">Next</a>
+		        </c:if>	
+		    </div>
+		</c:if>	
 	</c:if>
 	<input type="hidden" name="orderId" />
 </form:form>

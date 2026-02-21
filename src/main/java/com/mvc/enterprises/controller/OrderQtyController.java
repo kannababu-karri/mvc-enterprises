@@ -1,7 +1,6 @@
 package com.mvc.enterprises.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +62,14 @@ public class OrderQtyController {
     		value = "/showOrderQtyDetails",
     		method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public String showOrderQtyDetails(Model model, HttpServletRequest request) throws Exception {
+    public String showOrderQtyDetails(
+    		@RequestParam(defaultValue = "0") int page,
+    		Model model, 
+    		HttpServletRequest request) throws Exception {
     	
     	_LOGGER.info(">>> Inside showOrderQtyDetails. 1 <<<");
     	
-    	OrderQtyForm form = getAllOrderQtys(request);
+    	OrderQtyForm form = getAllOrderQtys(request, page);
     	
     	_LOGGER.info(">>> Inside showOrderQtyDetails. 2 <<<");
     	
@@ -87,10 +89,15 @@ public class OrderQtyController {
      * @param session
      * @return
      */
-    @PostMapping("/orderQtySearch")
+    //@PostMapping("/orderQtySearch")
+    @RequestMapping(
+    		value = "/orderQtySearch",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
     public String search(@ModelAttribute("orderqty") OrderQty orderQty, 
     										Model model,
-    										HttpServletRequest request) throws Exception  {
+    										HttpServletRequest request,
+    										@RequestParam(defaultValue = "0") int page) throws Exception  {
     	
     	_LOGGER.info(">>> Inside orderQtySearch. <<<");
     	
@@ -129,13 +136,20 @@ public class OrderQtyController {
         	url = url+"/search?manufacturerId="+manufacturerId+"&productId="+productId+"&userId="+userId;
         	_LOGGER.info(">>> Inside orderQtySearch. url:<<<"+url);
         	
+	    	String urlBuilder = UriComponentsBuilder
+        	        .fromHttpUrl(url)
+        	        .queryParam("page", page)
+        	        .queryParam("size", 5)
+        	        .buildAndExpand(uriVariables)
+        	        .encode()
+        	        .toUriString();
+        	
             //Call microservice
             response = restTemplate.exchange(
-	        	   		url,
+            		urlBuilder,
 	        	        HttpMethod.GET,
 	        	        entity,
-	        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {},
-	        	        uriVariables
+	        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {}
             		);
 	    } catch (Exception ex) {
 	    	model.addAttribute("error", "No orders are find for selected criteria.");
@@ -153,6 +167,7 @@ public class OrderQtyController {
     	if(pageDto != null && pageDto.getContent() != null && pageDto.getContent().size() > 0) {
     		form.setShowDetails(true);
     		form.setResultOrderQtys(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	} else {
     		model.addAttribute("error", "No orders are find for selected criteria.");
     	}
@@ -541,7 +556,7 @@ public class OrderQtyController {
    	            model.addAttribute("error", "Unexpected error: " + e.getMessage());
    	        }
    			
-	    	form = getAllOrderQtys(request);
+	    	form = getAllOrderQtys(request, 0);
 	    	
 	    	model.addAttribute("orderQtyForm", form);
 	    	
@@ -594,7 +609,7 @@ public class OrderQtyController {
     /**
      * Retrieving all orderQtys. This method is used in retrieve and save.
      */
-	private OrderQtyForm getAllOrderQtys(HttpServletRequest request) {
+	private OrderQtyForm getAllOrderQtys(HttpServletRequest request, int page) {
 		
 		User user = (User) request.getSession().getAttribute(Utils.getSessionLoginUserIdKey());
 		
@@ -614,12 +629,17 @@ public class OrderQtyController {
 		}
         _LOGGER.info(">>> Inside getAllOrderQtys. url:<<<"+url);
         
+        String urlBuilder = UriComponentsBuilder
+		        .fromHttpUrl(url)
+		        .queryParam("page", page)
+		        .queryParam("size", 5)
+		        .toUriString();
+        
         ResponseEntity<PageResponseDto<OrderQty>> response = restTemplate.exchange(
-        	   		url,
+        			urlBuilder,
         	        HttpMethod.GET,
         	        entity,
-        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {},
-        	        uriVariables
+        	        new ParameterizedTypeReference<PageResponseDto<OrderQty>>() {}
         		);
         
         //Convert array to list
@@ -634,6 +654,7 @@ public class OrderQtyController {
 		if(pageDto != null && pageDto.getContent() != null && pageDto.getContent().size() > 0) {
     		form.setShowDetails(true);
     		form.setResultOrderQtys(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	}
     	_LOGGER.info(">>> Inside getAllOrderQtys. END <<<");
 		return form;
@@ -714,48 +735,10 @@ public class OrderQtyController {
 	 * Get all manufacturer from RESTFUL
 	 * @return
 	 */
-	private List<OrderQty> getRestAllOrderQtys(HttpSession session) throws Exception {
-		_LOGGER.info(">>> Inside getRestAllOrderQtys. <<<");
-		//Microservice endpoint
-		String url = ILConstants.MICROSERVICE_RESTFUL_ORDERQTY_URL;
-		
-		ResponseEntity<OrderQty[]> response = null;
-		
-		try {
-			HttpEntity<Void> entity = getJwtTokenToHttpRequest(session, null);
-			_LOGGER.info(">>> Inside getRestAllOrderQtys. before calling microservice.<<<");
-			response =
-		        restTemplate.exchange(
-		                url,
-		                HttpMethod.GET,
-		                entity,
-		                OrderQty[].class
-		        );	
-			_LOGGER.info(">>> Inside getRestAllOrderQtys. after calling microservice.<<<");
-		} catch (Exception exp) {
-			_LOGGER.info(">>> Inside getRestAllOrderQtys exception. <<< "+exp.toString());
-			throw new Exception("Network Authentication Required");
-		}
-		
-		if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-			_LOGGER.info(">>> Inside getRestAllOrderQtys. <<< Unauthorized");
-			throw new Exception("Unauthorized");
-		} else if(response.getStatusCode() == HttpStatus.NOT_FOUND) {
-			_LOGGER.info(">>> Inside getRestAllOrderQtys. <<< Not Found<<< ");
-			throw new Exception("Not Found");
-		}
-		
-		return Arrays.asList(response.getBody());
-	}
-	
-	/**
-	 * Get all manufacturer from RESTFUL
-	 * @return
-	 */
 	private List<Manufacturer> getRestAllManufacturers(HttpSession session) throws Exception {
 		
 		_LOGGER.info(">>> Inside getRestAllManufacturers. <<<");
-		//Microservice endpoint
+		//micro service endpoint
 		String url = ILConstants.MICROSERVICE_RESTFUL_MANUFACTURER_URL;
 		
 		//ResponseEntity<Manufacturer[]> response = restTemplate.getForEntity(url, Manufacturer[].class, entity);
@@ -769,7 +752,7 @@ public class OrderQtyController {
 			        .queryParam("page", 0)
 			        .queryParam("size", 1000)
 			        .queryParam("sort", "mfgName")
-			        .toUriString();
+			        .toUriString(); 
 			
 			response =
 				    restTemplate.exchange(

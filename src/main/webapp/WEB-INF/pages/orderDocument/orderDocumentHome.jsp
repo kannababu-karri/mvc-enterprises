@@ -101,7 +101,30 @@
 					<td class="leftNoBold">${orderDocument.createdAt}</td>
 				</tr>																
 			</c:forEach>								
-		</table>	
+		</table>
+		<c:if test="${orderDocumentForm.pageResponseDto.totalPages > 1}">
+		    <div style="text-align:center;margin-top:20px;">
+		        <!-- Previous -->
+		        <c:if test="${orderDocumentForm.pageResponseDto.pageNumber > 0}">
+		            <a href="?page=${orderDocumentForm.pageResponseDto.pageNumber - 1}&orderDocument.manufacturerId=${orderDocumentForm.orderDocument.manufacturerId}&orderDocument.productId=${orderDocumentForm.orderDocument.productId}">Previous</a>
+		        </c:if>		
+		        <!-- Page Numbers -->
+		        <c:forEach begin="0" end="${orderDocumentForm.pageResponseDto.totalPages-1}" var="i">
+		            <c:choose>
+		                <c:when test="${i == orderDocumentForm.pageResponseDto.pageNumber}">
+		                    <b>[${i+1}]</b>
+		                </c:when>
+		                <c:otherwise>
+		                    <a href="?page=${i}&orderDocument.manufacturerId=${orderDocumentForm.orderDocument.manufacturerId}&orderDocument.productId=${orderDocumentForm.orderDocument.productId}">${i+1}</a>
+		                </c:otherwise>
+		            </c:choose>
+		        </c:forEach>		
+		        <!-- Next -->
+		        <c:if test="${orderDocumentForm.pageResponseDto.pageNumber < orderDocumentForm.pageResponseDto.totalPages-1}">
+		            <a href="?page=${orderDocumentForm.pageResponseDto.pageNumber + 1}&orderDocument.manufacturerId=${orderDocumentForm.orderDocument.manufacturerId}&orderDocument.productId=${orderDocumentForm.orderDocument.productId}">Next</a>
+		        </c:if>	
+		    </div>
+		</c:if>	
 	</c:if>
 	<input type="hidden" name="orderId" />
 </form:form>

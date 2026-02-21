@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.mvc.enterprises.entities.Manufacturer;
 import com.mvc.enterprises.entities.OrderDocument;
@@ -61,7 +62,10 @@ public class OrderDocumentController {
     		value = "/showMongoDbDetails",
     		method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public String showMongoDbDetails(Model model, HttpServletRequest request,
+    public String showMongoDbDetails(
+    		@RequestParam(defaultValue = "0") int page,
+    		Model model, 
+    		HttpServletRequest request,
     		RedirectAttributes redirectAttributes) throws Exception {
     	
     	User user = (User) request.getSession().getAttribute(Utils.getSessionLoginUserIdKey());
@@ -93,12 +97,20 @@ public class OrderDocumentController {
 	    		uriVariables.put("userId", String.valueOf(user.getUserId()));
 	    	}
 	    	
+	    	String urlBuilder = UriComponentsBuilder
+        	        .fromHttpUrl(url)
+        	        .queryParam("page", page)
+        	        .queryParam("size", 5)
+        	        .queryParam("sort", "mfgName")
+        	        .buildAndExpand(uriVariables)
+        	        .encode()
+        	        .toUriString();
+	    	
     		response = restTemplate.exchange(
-        	   		url,
+    				urlBuilder,
         	        HttpMethod.GET,
         	        entity,
-        	        new ParameterizedTypeReference<PageResponseDto<OrderDocument>>() {},
-        	        uriVariables
+        	        new ParameterizedTypeReference<PageResponseDto<OrderDocument>>() {}
         		);
 		} catch (Exception exp ) {
 			_LOGGER.error("Error:"+exp.toString());
@@ -142,6 +154,7 @@ public class OrderDocumentController {
     	if(!orderDocuments.isEmpty() && orderDocuments.size() > 0) {
     		form.setShowDetails(true);
     		form.setResultOrderDocuments(orderDocuments);
+    		form.setPageResponseDto(pageDto); 
     	}
     	
     	model.addAttribute("orderDocumentForm", form);
@@ -157,10 +170,15 @@ public class OrderDocumentController {
      * @param session
      * @return
      */
-    @PostMapping("/orderDocumentSearch")
+    //@GetMapping("/orderDocumentSearch")
+    @RequestMapping(
+    		value = "/orderDocumentSearch",
+    		method = {RequestMethod.GET, RequestMethod.POST}
+    )
     public String orderDocumentSearch(@ModelAttribute("orderDocumentForm") OrderDocumentForm form, 
     										Model model,
-    										HttpServletRequest request) throws Exception {
+    										HttpServletRequest request,
+    										@RequestParam(defaultValue = "0") int page) throws Exception {
     	_LOGGER.info("Entered into orderDocumentSearch");
     	
        	Long manufacturerId = form.getOrderDocument().getManufacturerId();
@@ -207,13 +225,21 @@ public class OrderDocumentController {
         	url = url+"/searchmongo?manufacturerId={manufacturerId}&productId={productId}&userId={userId}";
         	_LOGGER.info(">>> Inside orderDocumentSearch. url:<<<"+url);
         	
+        	String urlBuilder = UriComponentsBuilder
+        	        .fromHttpUrl(url)
+        	        .queryParam("page", page)
+        	        .queryParam("size", 5)
+        	        .queryParam("sort", "mfgName")
+        	        .buildAndExpand(uriVariables)
+        	        .encode()
+        	        .toUriString();
+        	
             //Call microservice
             response = restTemplate.exchange(
-	        	   		url,
+            			urlBuilder,
 	        	        HttpMethod.GET,
 	        	        entity,
-	        	        new ParameterizedTypeReference<PageResponseDto<OrderDocument>>() {},
-	        	        uriVariables
+	        	        new ParameterizedTypeReference<PageResponseDto<OrderDocument>>() {}
             		);
             // Convert array to list
         	if (response != null && response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
@@ -230,6 +256,7 @@ public class OrderDocumentController {
     	if(pageDto != null) {
     		form.setShowDetails(true);
     		form.setResultOrderDocuments(pageDto.getContent());
+    		form.setPageResponseDto(pageDto);
     	} else {
     		model.addAttribute("error", "No orders are find for selected criteria.");
     	}

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mvc.enterprises.entities.Manufacturer;
 import com.mvc.enterprises.entities.OrderQty;
+import com.mvc.enterprises.entities.PageResponseDto;
 import com.mvc.enterprises.entities.Product;
 
 public class OrderQtyForm {
@@ -12,6 +13,7 @@ public class OrderQtyForm {
     private boolean showDetails;
 	private OrderQty orderQty;
 	private Long orderId;
+	private PageResponseDto<?> pageResponseDto;
 	
 	private List<Manufacturer> manufacturers;
 	private List<Product> products;
@@ -66,5 +68,11 @@ public class OrderQtyForm {
 	}
 	public void setProduct(Product product) {
 		this.product = product;
+	}
+	public PageResponseDto<?> getPageResponseDto() {
+		return pageResponseDto;
+	}
+	public void setPageResponseDto(PageResponseDto<?> pageResponseDto) {
+		this.pageResponseDto = pageResponseDto;
 	}
 }
