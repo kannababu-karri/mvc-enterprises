@@ -129,7 +129,8 @@ public class AiAgentController {
 			batch.setProductName(productName);
 			User user = (User) session.getAttribute(Utils.getSessionLoginUserIdKey());
 			batch.setUploadedBy(user.getUserName());
-			batch.setUploadDate(LocalDateTime.now());
+			//AI Agent rest is setting up
+			//batch.setUploadDate(LocalDateTime.now());
 			batch.setStatus("Pending");
 			// batch = batchRecordService.save(batch); // save to batch_records
 
